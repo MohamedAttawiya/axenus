@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Products | Axen Labs</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <script defer src="js/include.js"></script>
+  <script defer src="js/main.js"></script>
+  <style>
+    /* ---------- Hero Section ---------- */
+    .products-hero {
+      background: url("assets/images/hero/Hero_1280.png") no-repeat center center / cover;
+      padding: 8rem 2rem 6rem;
+      text-align: center;
+      color: var(--white);
+    }
+
+    .products-hero h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .products-hero p {
+      font-size: 1.2rem;
+      color: var(--light-gray);
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    /* ---------- Product Sections ---------- */
+    .product-section {
+      max-width: 1200px;
+      margin: 4rem auto;
+      padding: 0 2rem;
+    }
+
+    .product-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .product-header img {
+      width: 320px;
+      height: auto;
+      margin-bottom: 1rem;
+    }
+
+    .product-header p {
+      color: var(--light-gray);
+      max-width: 720px;
+      margin: 0 auto;
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    /* ---------- Product Grid ---------- */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 3rem;
+      margin-top: 3rem;
+    }
+
+    .product-card {
+      background: #111;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 2rem;
+      text-align: center;
+      transition: transform 0.3s ease, border-color 0.3s ease;
+    }
+
+    .product-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--steel-cyan);
+    }
+
+    .product-card img {
+      width: 100%;
+      max-width: 380px;
+      height: auto;
+      margin-bottom: 1.5rem;
+      filter: drop-shadow(0 0 10px rgba(74,160,189,0.15));
+    }
+
+    .product-card h3 {
+      font-size: 1.5rem;
+      color: var(--white);
+      margin-bottom: 0.75rem;
+    }
+
+    .product-card p {
+      color: var(--light-gray);
+      font-size: 1rem;
+      line-height: 1.7;
+      margin-bottom: 1.2rem;
+    }
+
+    .product-meta {
+      font-size: 0.9rem;
+      color: var(--steel-cyan);
+      font-style: italic;
+    }
+
+    /* AXION accent */
+    .axion .product-card:hover {
+      border-color: #e4572e;
+    }
+    .axion .product-meta {
+      color: #e4572e;
+    }
+
+    @media (max-width: 768px) {
+      .products-hero h1 {
+        font-size: 2.2rem;
+      }
+      .product-header img {
+        width: 220px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="header"></div>
+
+  <!-- Hero Section -->
+  <section class="products-hero">
+    <h1>AXEN LABS Product Lines</h1>
+    <p>Two lines, one principle: precision chemistry engineered for proven results.</p>
+  </section>
+
+  <!-- ETHRIX Line -->
+  <section class="product-section ethrix">
+    <div class="product-header">
+      <img src="assets/images/brand/Etrhix_Main.png" alt="ETHRIX Logo" />
+      <p>
+        The ETHRIX Line is designed for ethanol-based performance applications — enhancing power output, combustion stability, and throttle response across ethanol blends (E10–E85).
+      </p>
+    </div>
+
+    <div class="product-grid">
+      <!-- ETHRIX Absolu -->
+      <div class="product-card">
+        <img src="assets/images/products/ETHRIX_Absolu_Render_1200.png" alt="ETHRIX Absolu" />
+        <h3>ETHRIX Absolu</h3>
+        <p>
+          High-purity ethanol blend enhancer that increases octane stability and optimizes combustion for all ethanol-blended fuels.
+        </p>
+        <p class="product-meta">Core product for ethanol optimization</p>
+      </div>
+
+      <!-- ETHRIX Ignis -->
+      <div class="product-card">
+        <img src="assets/images/products/ETHRIX_Ignis_Render_1200.png" alt="ETHRIX Ignis" />
+        <h3>ETHRIX Ignis</h3>
+        <p>
+          Track-grade octane accelerator engineered to reduce detonation and enhance throttle response. Designed for high-performance racing and flex-fuel vehicles.
+        </p>
+        <p class="product-meta">High-performance / racing applications</p>
+      </div>
+
+      <!-- ETHRIX Flux -->
+      <div class="product-card">
+        <img src="assets/images/products/ETHRIX_Flux_Render_1200.png" alt="ETHRIX Flux" />
+        <h3>ETHRIX Flux</h3>
+        <p>
+          Advanced ethanol combustion optimizer that refines fuel atomization and burn rate for improved efficiency and cleaner emissions.
+        </p>
+        <p class="product-meta">Combustion efficiency & consistency enhancer</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- AXION Line -->
+  <section class="product-section axion">
+    <div class="product-header">
+      <img src="assets/images/brand/Axion_Main.png" alt="AXION Logo" />
+      <p>
+        The AXION Line protects and preserves — engineered to combat ethanol’s downsides, including corrosion, phase separation, and system wear. Built for long-term stability and reliability.
+      </p>
+    </div>
+
+    <div class="product-grid">
+      <!-- AXION Shield -->
+      <div class="product-card">
+        <img src="assets/images/products/AXION_Shield_Render_1200.png" alt="AXION Shield" />
+        <h3>AXION Shield</h3>
+        <p>
+          Anti-corrosion system protector that defends fuel components from moisture and ethanol-induced wear. Ensures long-term durability and clean fuel delivery.
+        </p>
+        <p class="product-meta">Routine additive for all E-blends</p>
+      </div>
+
+      <!-- AXION Vault -->
+      <div class="product-card">
+        <img src="assets/images/products/AXION_Vault_Render_1200.png" alt="AXION Vault" />
+        <h3>AXION Vault</h3>
+        <p>
+          Long-term fuel stabilizer that prevents phase separation and oxidation during storage. Ideal for boats, generators, and seasonal vehicles.
+        </p>
+        <p class="product-meta">Long-term protection & storage stability</p>
+      </div>
+    </div>
+  </section>
+
+  <div id="footer"></div>
+</body>
+</html>

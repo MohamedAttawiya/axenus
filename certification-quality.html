@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Certification & Quality | Axen Labs</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <script defer src="js/include.js"></script>
+  <script defer src="js/main.js"></script>
+
+  <style>
+    /* ---- Hero ---- */
+    .cq-hero {
+      background: url("assets/images/hero/Hero_1280.png") no-repeat center center / cover;
+      padding: 8rem 2rem 6rem;
+      text-align: center;
+      color: var(--white);
+    }
+    .cq-hero h1 { font-size: 3rem; margin-bottom: 1rem; }
+    .cq-hero p  { color: var(--light-gray); font-size: 1.15rem; max-width: 760px; margin: 0 auto; }
+
+    /* ---- Section container ---- */
+    .cq-wrap {
+      max-width: 1200px;
+      margin: 4rem auto;
+      padding: 0 2rem;
+    }
+
+    .cq-group {
+      margin-bottom: 3rem;
+    }
+    .cq-group h2 {
+      font-size: 1.8rem;
+      color: var(--steel-cyan);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 1rem;
+    }
+    .cq-group p.lead { color: var(--light-gray); margin-bottom: 1rem; }
+
+    /* ---- Grid of certifications ---- */
+    .cq-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+    }
+    .cq-card {
+      background: #111;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 1.25rem 1.25rem 1rem;
+      transition: border-color .25s ease, transform .25s ease;
+    }
+    .cq-card:hover { border-color: var(--steel-cyan); transform: translateY(-3px); }
+    .cq-title { color: var(--white); font-weight: 700; margin-bottom: .35rem; }
+    .cq-note  { color: var(--light-gray); font-size: .98rem; line-height: 1.6; }
+
+    /* ---- Monogram / QA block ---- */
+    .qa-block {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 1.25rem;
+      align-items: center;
+      background: linear-gradient(180deg,#0f0f0f,#151515);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin: 3rem 0 2rem;
+    }
+    .qa-block img { width: 100%; max-width: 120px; opacity: .95; }
+    .qa-block p   { color: var(--light-gray); }
+    .divider { height: 1px; background: rgba(255,255,255,0.08); margin: 2.5rem 0; }
+
+    /* ---- SDS / Downloads ---- */
+    .downloads {
+      display: flex; gap: 1rem; flex-wrap: wrap;
+    }
+    .dl {
+      border: 1px solid rgba(255,255,255,0.12);
+      padding: .85rem 1.1rem; border-radius: 6px;
+      color: var(--white); text-decoration: none;
+      transition: background .25s ease, border-color .25s ease;
+    }
+    .dl:hover { background: var(--steel-cyan); color: var(--graphite-black); border-color: var(--steel-cyan); }
+
+    @media (max-width: 768px) {
+      .cq-hero h1 { font-size: 2.2rem; }
+      .qa-block { grid-template-columns: 1fr; text-align: center; }
+      .qa-block img { margin: 0 auto; }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="header"></div>
+
+  <!-- Hero -->
+  <section class="cq-hero">
+    <h1>Certification & Quality</h1>
+    <p>
+      Our chemistry is validated against stringent global standards. We operate on measured engineering, traceable batches,
+      and documented compliance — because performance is only meaningful when it’s proven.
+    </p>
+  </section>
+
+  <main class="cq-wrap">
+
+    <!-- Quality Systems -->
+    <section class="cq-group">
+      <h2>Quality Systems</h2>
+      <p class="lead">Frameworks that govern how we design, produce, and continuously improve our products.</p>
+
+      <div class="cq-grid">
+        <div class="cq-card">
+          <div class="cq-title">ISO 9001</div>
+          <div class="cq-note">Quality Management System — process control, documentation, and continuous improvement.</div>
+        </div>
+        <div class="cq-card">
+          <div class="cq-title">ISO 14001</div>
+          <div class="cq-note">Environmental Management System — reduced impact and compliant waste handling.</div>
+        </div>
+        <div class="cq-card">
+          <div class="cq-title">ISO 45001</div>
+          <div class="cq-note">Occupational Health & Safety — safe operations for people and facilities.</div>
+        </div>
+        <div class="cq-card">
+          <div class="cq-title">CARB Approval</div>
+          <div class="cq-note">California Air Resources Board — emissions compliance for applicable chemistries.</div>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Fuel & Material Standards -->
+    <section class="cq-group">
+      <h2>Fuel & Material Standards</h2>
+      <p class="lead">Specifications that our ethanol fuels, blends, and compatible materials are engineered to meet.</p>
+
+      <div class="cq-grid">
+        <div class="cq-card">
+          <div class="cq-title">ASTM D4806</div>
+          <div class="cq-note">Ethanol Fuel Standard — anhydrous ethanol requirements for blending.</div>
+        </div>
+        <div class="cq-card">
+          <div class="cq-title">ASTM D5798</div>
+          <div class="cq-note">Fuel Ethanol (E85) — volatility and composition specification.</div>
+        </div>
+        <div class="cq-card">
+          <div class="cq-title">ASTM D4814</div>
+          <div class="cq-note">Gasoline Blending Standard — quality parameters for gasoline/ethanol blends.</div>
+        </div>
+        <div class="cq-card">
+          <div class="cq-title">SAE J1681</div>
+          <div class="cq-note">Material Compatibility — guidance on fuels vs. polymers/elastomers/metals.</div>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Regulatory Compliance -->
+    <section class="cq-group">
+      <h2>Regulatory Compliance</h2>
+      <p class="lead">Registrations and frameworks for safe handling, labeling, and transport of chemical products.</p>
+
+      <div class="cq-grid">
+        <div class="cq-card">
+          <div class="cq-title">EPA Registration (40 CFR 79)</div>
+          <div class="cq-note">U.S. EPA Fuel Additive Registration — chemistry identity and emissions data.</div>
+        </div>
+        <div class="cq-card">
+          <div class="cq-title">REACH Compliance</div>
+          <div class="cq-note">EU chemical safety & registration for substances placed on the EU market.</div>
+        </div>
+        <div class="cq-card">
+          <div class="cq-title">RoHS</div>
+          <div class="cq-note">Restriction of Hazardous Substances — limits designated substances in products.</div>
+        </div>
+        <div class="cq-card">
+          <div class="cq-title">GHS SDS</div>
+          <div class="cq-note">Globally Harmonized System — standardized Safety Data Sheets & labeling.</div>
+        </div>
+        <div class="cq-card">
+          <div class="cq-title">NFPA 30</div>
+          <div class="cq-note">Flammable & Combustible Liquids Code — storage and handling practices.</div>
+        </div>
+        <div class="cq-card">
+          <div class="cq-title">DOT 49 CFR</div>
+          <div class="cq-note">Hazmat transportation — classification, packaging, and shipping compliance.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- QA / Batch Trace -->
+    <section class="qa-block">
+      <img src="assets/images/brand/FullColor_Monogram_White.png" alt="Axen Labs quality seal">
+      <div>
+        <h3 style="margin:0 0 .35rem 0;">Measured Engineering, Traceable Batches</h3>
+        <p>
+          Every production lot is quality-checked and traceable to raw inputs, test results, and release criteria.
+          Our monogram seal indicates compliance review and readiness for market.
+        </p>
+        <div class="downloads" style="margin-top:.75rem;">
+          <!-- Replace hrefs with actual files when available -->
+          <a class="dl" href="#" aria-disabled="true">Download SDS (PDF)</a>
+          <a class="dl" href="#" aria-disabled="true">Quality Policy (PDF)</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <div id="footer"></div>
+</body>
+</html>

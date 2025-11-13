@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Axen Labs | Precision. Proven.</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/homepage.css" />
+  <script defer src="js/include.js"></script>
+  <script defer src="js/main.js"></script>
+  <style>
+    /* ---------- Stats Section ---------- */
+    .stats {
+      background: #0f0f0f;
+      padding: 4rem 2rem;
+      text-align: center;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .stats h2 {
+      color: var(--white);
+      font-size: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .stats-grid {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 3rem;
+    }
+
+    .stat-item {
+      flex: 1 1 200px;
+      color: var(--white);
+    }
+
+    .stat-item h3 {
+      font-size: 2.5rem;
+      color: var(--steel-cyan);
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-item p {
+      color: var(--light-gray);
+      font-size: 1rem;
+    }
+
+    /* ---------- Product Highlight Section ---------- */
+    .product-highlight {
+      background: #111;
+      padding: 6rem 2rem;
+      text-align: center;
+    }
+
+    .product-highlight h2 {
+      font-size: 2rem;
+      color: var(--white);
+      margin-bottom: 1rem;
+    }
+
+    .product-highlight p {
+      color: var(--light-gray);
+      font-size: 1.1rem;
+      max-width: 760px;
+      margin: 0 auto 2.5rem;
+      line-height: 1.8;
+    }
+
+    .highlight-image {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .highlight-image img {
+      max-width: 420px;
+      height: auto;
+      filter: drop-shadow(0 0 12px rgba(74,160,189,0.25));
+      transition: transform 0.3s ease;
+    }
+
+    .highlight-image img:hover {
+      transform: scale(1.02);
+    }
+
+    @media (max-width: 768px) {
+      .stats-grid {
+        flex-direction: column;
+        gap: 2rem;
+      }
+
+      .highlight-image img {
+        max-width: 300px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Shared Header -->
+  <div id="header"></div>
+
+  <!-- Hero Section -->
+  <main class="hero">
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1>Precision. Proven.</h1>
+        <p>Performance engineered through chemistry and validation.</p>
+        <a href="products.html" class="cta">Explore ETHRIX</a>
+      </div>
+      <div class="hero-image">
+        <img src="assets/images/products/ETHRIX_Absolu_Render_1600.png" alt="ETHRIX Absolu bottle">
+      </div>
+    </div>
+  </main>
+
+  <!-- Stats Section -->
+  <section class="stats">
+    <h2>Trusted by performance experts worldwide</h2>
+    <div class="stats-grid">
+      <div class="stat-item">
+        <h3>+1M</h3>
+        <p>Customers globally</p>
+      </div>
+      <div class="stat-item">
+        <h3>3M+</h3>
+        <p>Units of ETHRIX Absolu sold</p>
+      </div>
+      <div class="stat-item">
+        <h3>15+</h3>
+        <p>Years of ethanol chemistry expertise</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Product Highlight Section -->
+  <section class="product-highlight">
+    <h2>ETHRIX Absolu — The Core of Ethanol Performance</h2>
+    <p>
+      ETHRIX Absolu is our flagship formulation — a high-purity ethanol blend enhancer engineered to deliver
+      measurable improvements in combustion efficiency, octane stability, and power output. Designed for modern
+      ethanol-blended fuels (E10–E85), it enables engines to perform with precision consistency, reduced knock,
+      and cleaner burn cycles.
+    </p>
+    <div class="highlight-image">
+      <img src="assets/images/products/ETHRIX_Absolu_Render_1200.png" alt="ETHRIX Absolu product image" />
+    </div>
+  </section>
+
+  <!-- Shared Footer -->
+  <div id="footer"></div>
+</body>
+</html>

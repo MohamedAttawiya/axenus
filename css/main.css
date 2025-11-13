@@ -1,0 +1,149 @@
+/* ========== Axen Labs Global Styles ========== */
+:root {
+  --graphite-black: #1B1B1B;
+  --steel-cyan: #4AA0BD;
+  --light-gray: #E6E6E6;
+  --white: #FFFFFF;
+  --transition: 0.3s ease;
+  --max-width: 1200px;
+  --font-sans: "Helvetica Neue", Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--graphite-black);
+  color: var(--white);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ----- Header ----- */
+.site-header {
+  background: rgba(27, 27, 27, 0.95);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  position: fixed;
+  width: 100%;
+  top: 0;
+  z-index: 10;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+.navbar .logo img {
+  height: 48px;        /* Increased from 36px */
+  transition: transform 0.2s ease;
+}
+
+.navbar .logo img:hover {
+  transform: scale(1.04);
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 1.5rem;
+}
+
+.nav-links a {
+  color: var(--light-gray);
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: color var(--transition);
+}
+
+.nav-links a:hover {
+  color: var(--steel-cyan);
+}
+
+/* ----- Footer ----- */
+.site-footer {
+  background: #0f0f0f;
+  text-align: center;
+  padding: 2rem 1rem;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.footer-logo {
+  width: 48px;
+  opacity: 0.9;
+  margin-bottom: 0.5rem;
+}
+/* ----- Responsive Nav (CSS-only toggle) ----- */
+.menu-toggle {
+  display: none;
+}
+
+.menu-icon {
+  display: none;
+  cursor: pointer;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 5px;
+}
+
+.menu-icon span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background-color: var(--light-gray);
+  transition: 0.3s;
+}
+
+/* Animate into X when active */
+.menu-toggle:checked + .menu-icon span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+.menu-toggle:checked + .menu-icon span:nth-child(2) {
+  opacity: 0;
+}
+.menu-toggle:checked + .menu-icon span:nth-child(3) {
+  transform: rotate(-45deg) translate(6px, -6px);
+}
+
+@media (max-width: 768px) {
+  /* Hide desktop nav, show hamburger */
+  .nav-links {
+    display: none;
+    position: absolute;
+    top: 64px;
+    right: 0;
+    width: 100%;
+    background: rgba(27, 27, 27, 0.97);
+    flex-direction: column;
+    text-align: center;
+    padding: 1rem 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .menu-icon {
+    display: flex;
+  }
+
+  /* Show nav when checked */
+  .menu-toggle:checked ~ .nav-links {
+    display: flex;
+  }
+
+  .nav-links li {
+    padding: 0.5rem 0;
+  }
+
+  .nav-links a {
+    font-size: 1rem;
+  }
+}
