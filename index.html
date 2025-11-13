@@ -8,146 +8,162 @@
   <link rel="stylesheet" href="css/homepage.css" />
   <script defer src="js/include.js"></script>
   <script defer src="js/main.js"></script>
-  <style>
-    /* ---------- Stats Section ---------- */
-    .stats {
-      background: #0f0f0f;
-      padding: 4rem 2rem;
-      text-align: center;
-      border-top: 1px solid rgba(255,255,255,0.05);
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-    }
-
-    .stats h2 {
-      color: var(--white);
-      font-size: 2rem;
-      margin-bottom: 2rem;
-    }
-
-    .stats-grid {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 3rem;
-    }
-
-    .stat-item {
-      flex: 1 1 200px;
-      color: var(--white);
-    }
-
-    .stat-item h3 {
-      font-size: 2.5rem;
-      color: var(--steel-cyan);
-      margin-bottom: 0.5rem;
-    }
-
-    .stat-item p {
-      color: var(--light-gray);
-      font-size: 1rem;
-    }
-
-    /* ---------- Product Highlight Section ---------- */
-    .product-highlight {
-      background: #111;
-      padding: 6rem 2rem;
-      text-align: center;
-    }
-
-    .product-highlight h2 {
-      font-size: 2rem;
-      color: var(--white);
-      margin-bottom: 1rem;
-    }
-
-    .product-highlight p {
-      color: var(--light-gray);
-      font-size: 1.1rem;
-      max-width: 760px;
-      margin: 0 auto 2.5rem;
-      line-height: 1.8;
-    }
-
-    .highlight-image {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .highlight-image img {
-      max-width: 420px;
-      height: auto;
-      filter: drop-shadow(0 0 12px rgba(74,160,189,0.25));
-      transition: transform 0.3s ease;
-    }
-
-    .highlight-image img:hover {
-      transform: scale(1.02);
-    }
-
-    @media (max-width: 768px) {
-      .stats-grid {
-        flex-direction: column;
-        gap: 2rem;
-      }
-
-      .highlight-image img {
-        max-width: 300px;
-      }
-    }
-  </style>
 </head>
 
 <body>
   <!-- Shared Header -->
   <div id="header"></div>
 
-  <!-- Hero Section -->
-  <main class="hero">
-    <div class="hero-content">
-      <div class="hero-text">
-        <h1>Precision. Proven.</h1>
-        <p>Performance engineered through chemistry and validation.</p>
-        <a href="products.html" class="cta">Explore ETHRIX</a>
+  <main>
+    <!-- Announcement Bar -->
+    <section class="announcement-bar">
+      <p>Now shipping direct from our lab. Complimentary U.S. shipping on orders over $75.</p>
+    </section>
+
+    <!-- Hero Section -->
+    <section class="hero hero-home">
+      <div class="hero-content">
+        <div class="hero-text">
+          <p class="eyebrow">Axen Labs Commerce</p>
+          <h1>Precision ethanol chemistry, ready to ship to your build.</h1>
+          <p>
+            Transform everyday ethanol blends into race-ready performance. The ETHRIX suite is trusted by pro tuners
+            and weekend builders to unlock consistent power, cooler temps, and cleaner fuel systems.
+          </p>
+          <div class="hero-actions">
+            <a class="cta-primary" href="products.html">Shop the ETHRIX lineup</a>
+            <a class="cta-secondary" href="ethrix-absolu.html">See Absolu in action</a>
+          </div>
+          <ul class="hero-metrics">
+            <li><strong>24-hour fulfillment</strong> on in-stock items</li>
+            <li><strong>Lab-validated</strong> for modern ethanol platforms</li>
+            <li><strong>Dedicated support</strong> from real chemists</li>
+          </ul>
+        </div>
+        <div class="hero-image">
+          <img src="assets/images/products/ETHRIX_Absolu_Render_1600.png" alt="ETHRIX Absolu bottle">
+        </div>
       </div>
-      <div class="hero-image">
-        <img src="assets/images/products/ETHRIX_Absolu_Render_1600.png" alt="ETHRIX Absolu bottle">
+    </section>
+
+    <!-- Trust Bar -->
+    <section class="trust-bar">
+      <div class="trust-bar__content">
+        <span>Built for:</span>
+        <ul>
+          <li>Flex-fuel conversions</li>
+          <li>Dyno tuning houses</li>
+          <li>Endurance racing teams</li>
+          <li>Modern DI platforms</li>
+        </ul>
       </div>
-    </div>
+    </section>
+
+    <!-- Product Grid -->
+    <section class="product-showcase" aria-labelledby="shop-lineup">
+      <div class="section-heading">
+        <p class="eyebrow">Shop the lineup</p>
+        <h2 id="shop-lineup">ETHRIX solutions engineered to buy with confidence</h2>
+        <p>Choose the chemistry that fits your ethanol program. Every bottle ships with precise mix guidance and
+          priority lab support.</p>
+      </div>
+      <div class="product-grid">
+        <a class="product-card" href="ethrix-absolu.html">
+          <img src="assets/images/products/ETHRIX_Absolu_Render_1200.png" alt="ETHRIX Absolu bottle">
+          <div class="product-card__body">
+            <h3>ETHRIX Absolu</h3>
+            <p>Baseline ethanol stabilizer for daily-driven and flex-fuel builds.</p>
+            <span class="product-price">$39.00</span>
+            <span class="product-cta">View product</span>
+          </div>
+        </a>
+        <a class="product-card" href="ethrix-ignis.html">
+          <img src="assets/images/products/ETHRIX_Ignis_Render_1200.png" alt="ETHRIX Ignis bottle">
+          <div class="product-card__body">
+            <h3>ETHRIX Ignis</h3>
+            <p>Thermal control and anti-knock blend for high-boost street cars.</p>
+            <span class="product-price">$45.00</span>
+            <span class="product-cta">View product</span>
+          </div>
+        </a>
+        <a class="product-card" href="ethrix-flux.html">
+          <img src="assets/images/products/ETHRIX_Flux_Render_1200.png" alt="ETHRIX Flux bottle">
+          <div class="product-card__body">
+            <h3>ETHRIX Flux</h3>
+            <p>Injector-safe power additive to maintain consistent ethanol quality.</p>
+            <span class="product-price">$49.00</span>
+            <span class="product-cta">View product</span>
+          </div>
+        </a>
+        <a class="product-card" href="axion-shield.html">
+          <img src="assets/images/products/AXION_Shield_Render_1200.png" alt="AXION Shield bottle">
+          <div class="product-card__body">
+            <h3>AXION Shield</h3>
+            <p>Fuel system protectant that keeps corrosive contaminants in check.</p>
+            <span class="product-price">$35.00</span>
+            <span class="product-cta">View product</span>
+          </div>
+        </a>
+        <a class="product-card" href="axion-vault.html">
+          <img src="assets/images/products/AXION_Vault_Render_1200.png" alt="AXION Vault bottle">
+          <div class="product-card__body">
+            <h3>AXION Vault</h3>
+            <p>Storage stabilizer engineered for ethanol-heavy long-term storage.</p>
+            <span class="product-price">$42.00</span>
+            <span class="product-cta">View product</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- Differentiators -->
+    <section class="value-props" aria-labelledby="why-axen">
+      <div class="section-heading">
+        <p class="eyebrow">Why Axen Labs</p>
+        <h2 id="why-axen">Engineered to convert curiosity into repeat orders</h2>
+      </div>
+      <div class="value-grid">
+        <div class="value-card">
+          <h3>Verified lab data</h3>
+          <p>Every formulation ships with QR-linked validation sheets so customers see the chemistry before they pour.</p>
+        </div>
+        <div class="value-card">
+          <h3>Seamless onboarding</h3>
+          <p>Automated mix calculators, install guides, and real-person support make going from cart to fuel tank simple.</p>
+        </div>
+        <div class="value-card">
+          <h3>Scale-ready logistics</h3>
+          <p>Real-time stock visibility, subscription refills, and 24-hour lab fulfillment keep your program moving.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured bundle CTA -->
+    <section class="bundle-callout">
+      <div class="bundle-content">
+        <div class="bundle-copy">
+          <p class="eyebrow">Recommended Bundle</p>
+          <h2>Start with the ETHRIX Starter Pack</h2>
+          <p>Pair Absolu with Ignis and Flux to balance daily drivability with track-ready output. Includes detailed dosing
+            charts for flex-fuel sensors and boosted platforms.</p>
+          <div class="bundle-actions">
+            <a class="cta-primary" href="ethrix-absolu.html">Build your bundle</a>
+            <a class="cta-tertiary" href="products.html">Browse all products</a>
+          </div>
+        </div>
+        <img src="assets/images/products/ETHRIX_Flux_Render_1600.png" alt="ETHRIX product bundle" />
+      </div>
+    </section>
+
+    <!-- Conversion CTA -->
+    <section class="cta-strip">
+      <div class="cta-strip__content">
+        <h2>Ready to power your ethanol program?</h2>
+        <p>Shop now and join thousands of builders who rely on Axen Labs for proven, repeatable results.</p>
+      </div>
+      <a class="cta-primary" href="products.html">Shop all products</a>
+    </section>
   </main>
-
-  <!-- Stats Section -->
-  <section class="stats">
-    <h2>Trusted by performance experts worldwide</h2>
-    <div class="stats-grid">
-      <div class="stat-item">
-        <h3>+1M</h3>
-        <p>Customers globally</p>
-      </div>
-      <div class="stat-item">
-        <h3>3M+</h3>
-        <p>Units of ETHRIX Absolu sold</p>
-      </div>
-      <div class="stat-item">
-        <h3>15+</h3>
-        <p>Years of ethanol chemistry expertise</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Product Highlight Section -->
-  <section class="product-highlight">
-    <h2>ETHRIX Absolu — The Core of Ethanol Performance</h2>
-    <p>
-      ETHRIX Absolu is our flagship formulation — a high-purity ethanol blend enhancer engineered to deliver
-      measurable improvements in combustion efficiency, octane stability, and power output. Designed for modern
-      ethanol-blended fuels (E10–E85), it enables engines to perform with precision consistency, reduced knock,
-      and cleaner burn cycles.
-    </p>
-    <div class="highlight-image">
-      <img src="assets/images/products/ETHRIX_Absolu_Render_1200.png" alt="ETHRIX Absolu product image" />
-    </div>
-  </section>
 
   <!-- Shared Footer -->
   <div id="footer"></div>

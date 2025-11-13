@@ -104,6 +104,44 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+.product-urgency {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  background: rgba(74, 160, 189, 0.06);
+  border: 1px solid rgba(74, 160, 189, 0.35);
+  border-radius: 14px;
+  padding: 1.1rem 1.25rem;
+  margin-bottom: 2rem;
+  color: #1b1b1b;
+  transition: border-color 0.3s ease, background 0.3s ease;
+}
+
+.product-urgency.low-stock {
+  border-color: #d26b2f;
+  background: rgba(210, 107, 47, 0.12);
+}
+
+.product-urgency .urgency-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.product-urgency .urgency-copy {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.product-urgency .urgency-copy p {
+  font-size: 0.95rem;
+  color: #2c2c2c;
+  margin: 0;
+}
+
+.product-urgency .urgency-copy strong {
+  color: #1b1b1b;
+}
+
 .product-actions .btn-primary {
   background: #1b1b1b;
   color: #ffffff;
@@ -235,6 +273,10 @@
   }
 
   .product-actions {
+    flex-direction: column;
+  }
+
+  .product-urgency {
     flex-direction: column;
   }
 }
