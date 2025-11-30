@@ -196,7 +196,7 @@ function buildWheelOverlay() {
         <div class="fortune-modal__copy">
           <p class="fortune-modal__eyebrow">Site wide coupon</p>
           <h2 class="fortune-modal__title">Spin for an Axen Labs bonus</h2>
-          <p class="fortune-modal__body">Every slot is engineered for builders, but this wheel is rigged in your favor. Spin to reveal the lab's best offer.</p>
+          <p class="fortune-modal__body">Spin to reveal the AXEN's gift to you!</p>
           <div class="fortune-modal__result" data-wheel-status>Spin to reveal your offer.</div>
           <div class="fortune-modal__badge" data-wheel-badge aria-live="polite">You won 20% off. Applied automatically at checkout.</div>
           <p class="fortune-modal__note" data-wheel-note>Applied automatically at checkout.</p>
@@ -247,7 +247,7 @@ function startWheelSpin({ overlay, spinButton, wheelImage, status, badge, note }
   overlay.classList.add("is-spinning");
   spinButton.disabled = true;
   spinButton.textContent = "Spinning...";
-  status.textContent = "Calibrating the lab wheel...";
+  status.textContent = "Spinning...";
 
   const baseTurns = 6 + Math.floor(Math.random() * 3);
   const finalRotation = baseTurns * 360 + WHEEL_WIN_ANGLE;
