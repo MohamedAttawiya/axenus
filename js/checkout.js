@@ -1,3 +1,22 @@
+import { Cart } from "./cart.js";
+
+const sid = (document.cookie.match(/(?:^|; )ax_sess=([^;]*)/)||[])[1] || "";
+const buyNowKey = `checkout:${sid}`;
+let items = [];
+
+(function hydrate(){
+  const raw = sessionStorage.getItem(buyNowKey);
+  if (raw) {
+    try { const b = JSON.parse(raw); if (b?.items?.length) items = b.items; } catch {}
+    sessionStorage.removeItem(buyNowKey);
+  }
+  if (!items.length) items = Cart.read().items;
+
+  renderOrderSummary(items); // use your existing UI renderer
+  renderTotals();            // reuse your totals logic; or derive from Cart.totals()
+})();
+
+
 const PRODUCT_CATALOG = {
   absolu: { name: "ETHRIX Absolu", price: 89 },
   flux: { name: "ETHRIX Flux", price: 64 },
