@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="css/product-detail.css" />
   <script defer src="js/include.js"></script>
   <script defer src="js/main.js"></script>
+  <script type="module" defer src="js/product-page.js"></script>
 </head>
 <body>
   <div id="header"></div>
@@ -28,8 +29,26 @@
             classic carbureted rides to the latest DI platforms, Shield keeps components clean and responsive.
           </p>
           <div class="product-actions">
-            <button class="btn-primary" type="button">Add to cart</button>
-            <button class="btn-secondary" type="button">Buy it now</button>
+            <button
+              class="btn-primary add-to-cart"
+              type="button"
+              data-id="axion-shield"
+              data-name="AXION Shield"
+              data-price="32"
+              data-image="assets/images/products/AXION_Shield_Render_1200.png"
+            >
+              Add to cart
+            </button>
+            <button
+              class="btn-secondary buy-now"
+              type="button"
+              data-id="axion-shield"
+              data-name="AXION Shield"
+              data-price="32"
+              data-image="assets/images/products/AXION_Shield_Render_1200.png"
+            >
+              Buy it now
+            </button>
           </div>
           <div class="product-urgency" data-product-stats="axion-shield" role="status" aria-live="polite">
             <span class="urgency-icon" aria-hidden="true">🔥</span>

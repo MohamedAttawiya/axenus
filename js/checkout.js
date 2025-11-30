@@ -1,33 +1,69 @@
 import { Cart } from "./cart.js";
 
-const sid = (document.cookie.match(/(?:^|; )ax_sess=([^;]*)/)||[])[1] || "";
-const buyNowKey = `checkout:${sid}`;
-let items = [];
-
-(function hydrate(){
-  const raw = sessionStorage.getItem(buyNowKey);
-  if (raw) {
-    try { const b = JSON.parse(raw); if (b?.items?.length) items = b.items; } catch {}
-    sessionStorage.removeItem(buyNowKey);
-  }
-  if (!items.length) items = Cart.read().items;
-
-  renderOrderSummary(items); // use your existing UI renderer
-  renderTotals();            // reuse your totals logic; or derive from Cart.totals()
-})();
-
-
 const PRODUCT_CATALOG = {
-  absolu: { name: "ETHRIX Absolu", price: 89 },
-  flux: { name: "ETHRIX Flux", price: 64 },
-  shield: { name: "Axion Shield", price: 48 }
+  absolu: {
+    name: "ETHRIX Absolu",
+    price: 39,
+    image: "assets/images/products/ETHRIX_Absolu_Render_1200.png"
+  },
+  flux: {
+    name: "ETHRIX Flux",
+    price: 45,
+    image: "assets/images/products/ETHRIX_Flux_Render_1200.png"
+  },
+  shield: {
+    name: "AXION Shield",
+    price: 32,
+    image: "assets/images/products/AXION_Shield_Render_1200.png"
+  }
 };
 
 const DISCOUNT_RATE = 0.2;
+const sid = (document.cookie.match(/(?:^|; )ax_sess=([^;]*)/) || [])[1] || "";
+const buyNowKey = `checkout:${sid}`;
+let items = [];
+
+const normalizeItems = (list = []) =>
+  (Array.isArray(list) ? list : [])
+    .map((it) => ({
+      id: it.id,
+      name: it.name,
+      price: Number(it.price) || 0,
+      qty: Number(it.qty) || 1,
+      image: it.image || ""
+    }))
+    .filter((it) => !!it.id);
+
+function hydrateItemsFromStorage() {
+  const raw = sessionStorage.getItem(buyNowKey);
+
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw);
+      const normalized = normalizeItems(parsed?.items);
+
+      if (normalized.length) {
+        Cart.write({ items: normalized });
+        items = normalized;
+      }
+    } catch (err) {
+      console.error("Failed to hydrate buy now payload", err);
+    }
+
+    sessionStorage.removeItem(buyNowKey);
+  }
+
+  if (!items.length) {
+    items = Cart.read().items;
+  }
+}
+
+function syncItemsFromCart() {
+  items = Cart.read().items;
+}
 
 window.addEventListener("DOMContentLoaded", () => {
-  const cart = {};
-  let shippingCost = getSelectedShippingCost();
+  hydrateItemsFromStorage();
 
   const cartList = document.querySelector("[data-cart-items]");
   const subtotalNode = document.querySelector("[data-subtotal]");
@@ -36,9 +72,25 @@ window.addEventListener("DOMContentLoaded", () => {
   const totalNode = document.querySelector("[data-total]");
   const addressDisplay = document.querySelector("[data-selected-address]");
 
+  let shippingCost = getSelectedShippingCost();
+
   document.querySelectorAll("[data-add-product]").forEach((button) => {
     button.addEventListener("click", () => {
-      addToCart(button.dataset.addProduct);
+      const productKey = button.dataset.addProduct;
+      const product = PRODUCT_CATALOG[productKey];
+      if (!product) return;
+
+      Cart.add({
+        id: productKey,
+        name: product.name,
+        price: product.price,
+        image: product.image,
+        qty: 1
+      });
+
+      syncItemsFromCart();
+      renderCartItems();
+      renderTotals();
     });
   });
 
@@ -57,46 +109,37 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  function addToCart(productKey) {
-    if (!PRODUCT_CATALOG[productKey]) return;
+  renderCartItems();
+  renderTotals();
 
-    cart[productKey] = (cart[productKey] || 0) + 1;
-    renderCart();
-    renderTotals();
-  }
-
-  function renderCart() {
+  function renderCartItems() {
     if (!cartList) return;
 
     cartList.innerHTML = "";
 
-    const entries = Object.entries(cart);
-    if (!entries.length) {
-      cartList.innerHTML = '<p class="cart-empty">Your cart is ready whenever you are. Add an item to see it here.</p>';
+    if (!items.length) {
+      cartList.innerHTML =
+        '<p class="cart-empty">Your cart is ready whenever you are. Add an item to see it here.</p>';
       return;
     }
 
-    entries.forEach(([key, quantity]) => {
-      const product = PRODUCT_CATALOG[key];
-      const linePrice = product.price * quantity;
-      const item = document.createElement("div");
-      item.className = "cart-item";
-      item.innerHTML = `
+    items.forEach((item) => {
+      const linePrice = item.price * item.qty;
+      const node = document.createElement("div");
+      node.className = "cart-item";
+      node.innerHTML = `
         <div>
-          <div>${product.name}</div>
-          <div class="cart-item__meta">Qty ${quantity} · $${product.price.toFixed(2)} each</div>
+          <div>${item.name}</div>
+          <div class="cart-item__meta">Qty ${item.qty} · ${formatCurrency(item.price)} each</div>
         </div>
-        <div class="cart-item__total">$${linePrice.toFixed(2)}</div>
+        <div class="cart-item__total">${formatCurrency(linePrice)}</div>
       `;
-      cartList.appendChild(item);
+      cartList.appendChild(node);
     });
   }
 
   function calculateSubtotal() {
-    return Object.entries(cart).reduce((total, [key, qty]) => {
-      const product = PRODUCT_CATALOG[key];
-      return total + product.price * qty;
-    }, 0);
+    return items.reduce((total, item) => total + item.price * item.qty, 0);
   }
 
   function renderTotals() {
@@ -121,6 +164,4 @@ window.addEventListener("DOMContentLoaded", () => {
     const checked = document.querySelector('input[name="shipping"]:checked');
     return checked ? Number(checked.dataset.shippingCost) : 0;
   }
-
-  renderTotals();
 });

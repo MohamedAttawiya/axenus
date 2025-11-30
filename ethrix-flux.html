@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="css/product-detail.css" />
   <script defer src="js/include.js"></script>
   <script defer src="js/main.js"></script>
+  <script type="module" defer src="js/product-page.js"></script>
 </head>
 <body>
   <div id="header"></div>
@@ -28,8 +29,26 @@
             and measurable gains in fuel economy without sacrificing peak power.
           </p>
           <div class="product-actions">
-            <button class="btn-primary" type="button">Add to cart</button>
-            <button class="btn-secondary" type="button">Buy it now</button>
+            <button
+              class="btn-primary add-to-cart"
+              type="button"
+              data-id="ethrix-flux"
+              data-name="ETHRIX Flux"
+              data-price="45"
+              data-image="assets/images/products/ETHRIX_Flux_Render_1200.png"
+            >
+              Add to cart
+            </button>
+            <button
+              class="btn-secondary buy-now"
+              type="button"
+              data-id="ethrix-flux"
+              data-name="ETHRIX Flux"
+              data-price="45"
+              data-image="assets/images/products/ETHRIX_Flux_Render_1200.png"
+            >
+              Buy it now
+            </button>
           </div>
           <div class="product-urgency" data-product-stats="ethrix-flux" role="status" aria-live="polite">
             <span class="urgency-icon" aria-hidden="true">🔥</span>
