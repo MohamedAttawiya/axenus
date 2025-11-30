@@ -49,6 +49,7 @@ const PRODUCT_AVAILABILITY = {
 document.addEventListener("DOMContentLoaded", () => {
   console.log("Axen Labs website loaded.");
   hydrateProductUrgency();
+  initWheelOfFortune();
 });
 
 function hydrateProductUrgency() {
@@ -164,4 +165,135 @@ function randomBetween(min, max) {
 
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
+}
+
+// ---------- Wheel of Fortune Offer ----------
+const WHEEL_STORAGE_KEY = "axen-wheel-shown";
+const WHEEL_SPIN_DURATION = 5200;
+const WHEEL_WIN_ANGLE = 0; // aligns the 20% off wedge to the pointer
+
+function initWheelOfFortune() {
+  if (!supportsLocalStorage() || hasSeenWheel()) return;
+
+  const overlay = buildWheelOverlay();
+  if (!overlay) return;
+
+  document.body.appendChild(overlay);
+  requestAnimationFrame(() => overlay.classList.add("is-visible"));
+  markWheelSeen();
+  bindWheelEvents(overlay);
+}
+
+function buildWheelOverlay() {
+  const overlay = document.createElement("div");
+  overlay.className = "fortune-overlay";
+
+  overlay.innerHTML = `
+    <div class="fortune-overlay__backdrop" data-wheel-close></div>
+    <div class="fortune-modal" role="dialog" aria-label="Spin for an Axen Labs bonus">
+      <button class="fortune-modal__close" type="button" aria-label="Close spin wheel" data-wheel-close>&times;</button>
+      <div class="fortune-modal__grid">
+        <div class="fortune-modal__copy">
+          <p class="fortune-modal__eyebrow">Site wide coupon</p>
+          <h2 class="fortune-modal__title">Spin for an Axen Labs bonus</h2>
+          <p class="fortune-modal__body">Every slot is engineered for builders, but this wheel is rigged in your favor. Spin to reveal the lab's best offer.</p>
+          <div class="fortune-modal__result" data-wheel-status>Spin to reveal your offer.</div>
+          <div class="fortune-modal__badge" data-wheel-badge aria-live="polite">You won 20% off. Applied automatically at checkout.</div>
+          <p class="fortune-modal__note" data-wheel-note>Applied automatically at checkout.</p>
+          <button class="fortune-modal__button" type="button" data-spin-button>Spin Now</button>
+        </div>
+        <div class="fortune-modal__visual">
+          <div class="fortune-wheel" aria-hidden="true">
+            <div class="fortune-wheel__glow"></div>
+            <img src="assets/images/brand/wheel.png" alt="Axen Labs bonus wheel" class="fortune-wheel__image" data-wheel-image />
+            <div class="fortune-wheel__pointer"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  return overlay;
+}
+
+function bindWheelEvents(overlay) {
+  const closeTriggers = overlay.querySelectorAll("[data-wheel-close]");
+  const spinButton = overlay.querySelector("[data-spin-button]");
+  const wheelImage = overlay.querySelector("[data-wheel-image]");
+  const status = overlay.querySelector("[data-wheel-status]");
+  const badge = overlay.querySelector("[data-wheel-badge]");
+  const note = overlay.querySelector("[data-wheel-note]");
+
+  closeTriggers.forEach((trigger) => {
+    trigger.addEventListener("click", () => closeWheelOverlay(overlay));
+  });
+
+  if (!spinButton || !wheelImage || !status || !badge || !note) return;
+
+  spinButton.addEventListener("click", () => {
+    if (overlay.dataset.wheelComplete === "true") {
+      closeWheelOverlay(overlay);
+      return;
+    }
+
+    startWheelSpin({ overlay, spinButton, wheelImage, status, badge, note });
+  });
+}
+
+function startWheelSpin({ overlay, spinButton, wheelImage, status, badge, note }) {
+  if (wheelImage.dataset.spinning === "true") return;
+
+  wheelImage.dataset.spinning = "true";
+  overlay.classList.add("is-spinning");
+  spinButton.disabled = true;
+  spinButton.textContent = "Spinning...";
+  status.textContent = "Calibrating the lab wheel...";
+
+  const baseTurns = 6 + Math.floor(Math.random() * 3);
+  const finalRotation = baseTurns * 360 + WHEEL_WIN_ANGLE;
+  wheelImage.style.setProperty("--wheel-rotation", `${finalRotation}deg`);
+
+  window.setTimeout(() => {
+    overlay.dataset.wheelComplete = "true";
+    overlay.classList.add("has-result");
+    overlay.classList.remove("is-spinning");
+    wheelImage.dataset.spinning = "false";
+    spinButton.disabled = false;
+    spinButton.textContent = "Continue Shopping";
+    status.textContent = "You won 20% off. Use it automatically at checkout.";
+    badge.textContent = "20% off applied automatically at checkout.";
+    note.textContent = "Applied automatically at checkout.";
+  }, WHEEL_SPIN_DURATION);
+}
+
+function closeWheelOverlay(overlay) {
+  overlay.classList.remove("is-visible");
+  window.setTimeout(() => overlay.remove(), 240);
+}
+
+function hasSeenWheel() {
+  try {
+    return window.localStorage.getItem(WHEEL_STORAGE_KEY) === "true";
+  } catch (_err) {
+    return false;
+  }
+}
+
+function markWheelSeen() {
+  try {
+    window.localStorage.setItem(WHEEL_STORAGE_KEY, "true");
+  } catch (_err) {
+    // no-op
+  }
+}
+
+function supportsLocalStorage() {
+  try {
+    const key = "__wheel_test__";
+    window.localStorage.setItem(key, "1");
+    window.localStorage.removeItem(key);
+    return true;
+  } catch (_err) {
+    return false;
+  }
 }
