@@ -5,9 +5,12 @@ const PRODUCT_CATALOG = {
 };
 
 const DISCOUNT_RATE = 0.2;
+const CART_STORAGE_KEY = "axen-demo-cart";
+const SHIPPING_STORAGE_KEY = "axen-demo-shipping";
+const ADDRESS_STORAGE_KEY = "axen-demo-address";
 
 window.addEventListener("DOMContentLoaded", () => {
-  const cart = {};
+  let cart = loadCartFromStorage();
   let shippingCost = getSelectedShippingCost();
 
   const cartList = document.querySelector("[data-cart-items]");
@@ -16,6 +19,18 @@ window.addEventListener("DOMContentLoaded", () => {
   const shippingNode = document.querySelector("[data-shipping]");
   const totalNode = document.querySelector("[data-total]");
   const addressDisplay = document.querySelector("[data-selected-address]");
+  const checkoutButton = document.querySelector("[data-place-order]");
+  const checkoutStatus = document.querySelector("[data-checkout-status]");
+  const confirmationCard = document.querySelector("[data-confirmation]");
+  const confirmationId = document.querySelector("[data-confirmation-id]");
+  const confirmationSummary = document.querySelector("[data-confirmation-summary]");
+  const confirmationItems = document.querySelector("[data-confirmation-items]");
+  const confirmationTotal = document.querySelector("[data-confirmation-total]");
+
+  hydrateShippingFromStorage();
+  hydrateAddressFromStorage();
+  renderCart();
+  renderTotals();
 
   document.querySelectorAll("[data-add-product]").forEach((button) => {
     button.addEventListener("click", () => {
@@ -26,6 +41,7 @@ window.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll('input[name="shipping"]').forEach((input) => {
     input.addEventListener("change", () => {
       shippingCost = getSelectedShippingCost();
+      persistShippingSelection(input.value);
       renderTotals();
     });
   });
@@ -35,13 +51,44 @@ window.addEventListener("DOMContentLoaded", () => {
       if (addressDisplay) {
         addressDisplay.textContent = input.dataset.addressLabel;
       }
+      persistAddressSelection(input.value);
     });
   });
+
+  if (checkoutButton) {
+    checkoutButton.addEventListener("click", async () => {
+      const paymentIsValid = validatePaymentForm();
+
+      if (!Object.keys(cart).length) {
+        showStatus("Add at least one item before placing your mock order.", "error");
+        return;
+      }
+
+      if (!paymentIsValid) {
+        showStatus("Enter a name and mock card details to continue.", "error");
+        return;
+      }
+
+      setProcessing(true);
+      showStatus("Simulating checkout...", "info");
+
+      const orderPayload = buildOrderPayload();
+      const response = await simulateOrderRequest(orderPayload);
+
+      renderConfirmation(response);
+      clearCart();
+      renderCart();
+      renderTotals();
+      setProcessing(false);
+      showStatus("Order simulation complete. Confirmation generated below.", "success");
+    });
+  }
 
   function addToCart(productKey) {
     if (!PRODUCT_CATALOG[productKey]) return;
 
     cart[productKey] = (cart[productKey] || 0) + 1;
+    persistCart();
     renderCart();
     renderTotals();
   }
@@ -80,13 +127,19 @@ window.addEventListener("DOMContentLoaded", () => {
     }, 0);
   }
 
-  function renderTotals() {
-    if (!subtotalNode || !discountNode || !shippingNode || !totalNode) return;
-
+  function calculateTotals() {
     const subtotal = calculateSubtotal();
     const discount = subtotal * DISCOUNT_RATE;
     const shipping = subtotal > 0 ? shippingCost : 0;
     const total = subtotal - discount + shipping;
+
+    return { subtotal, discount, shipping, total };
+  }
+
+  function renderTotals() {
+    if (!subtotalNode || !discountNode || !shippingNode || !totalNode) return;
+
+    const { subtotal, discount, shipping, total } = calculateTotals();
 
     subtotalNode.textContent = formatCurrency(subtotal);
     discountNode.textContent = `-${formatCurrency(discount)}`;
@@ -103,5 +156,133 @@ window.addEventListener("DOMContentLoaded", () => {
     return checked ? Number(checked.dataset.shippingCost) : 0;
   }
 
-  renderTotals();
+  function getSelectedShippingLabel() {
+    const checked = document.querySelector('input[name="shipping"]:checked');
+    return checked ? checked.dataset.shippingLabel || checked.value : "";
+  }
+
+  function getSelectedAddressLabel() {
+    const checked = document.querySelector('input[name="address"]:checked');
+    return checked ? checked.dataset.addressLabel || checked.value : "";
+  }
+
+  function persistCart() {
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+  }
+
+  function persistShippingSelection(value) {
+    localStorage.setItem(SHIPPING_STORAGE_KEY, value);
+  }
+
+  function persistAddressSelection(value) {
+    localStorage.setItem(ADDRESS_STORAGE_KEY, value);
+  }
+
+  function loadCartFromStorage() {
+    try {
+      const raw = localStorage.getItem(CART_STORAGE_KEY);
+      if (!raw) return {};
+      const parsed = JSON.parse(raw);
+      return Object.keys(parsed || {}).reduce((acc, key) => {
+        if (PRODUCT_CATALOG[key]) {
+          acc[key] = Number(parsed[key]) || 0;
+        }
+        return acc;
+      }, {});
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function hydrateShippingFromStorage() {
+    const stored = localStorage.getItem(SHIPPING_STORAGE_KEY);
+    if (!stored) return;
+    const match = document.querySelector(`input[name="shipping"][value="${stored}"]`);
+    if (match) {
+      match.checked = true;
+      shippingCost = getSelectedShippingCost();
+    }
+  }
+
+  function hydrateAddressFromStorage() {
+    const stored = localStorage.getItem(ADDRESS_STORAGE_KEY);
+    const match = stored ? document.querySelector(`input[name="address"][value="${stored}"]`) : null;
+    if (match) {
+      match.checked = true;
+      if (addressDisplay) {
+        addressDisplay.textContent = match.dataset.addressLabel;
+      }
+    }
+  }
+
+  function setProcessing(isProcessing) {
+    if (!checkoutButton) return;
+    checkoutButton.disabled = isProcessing;
+    checkoutButton.textContent = isProcessing ? "Processing..." : "Place order";
+  }
+
+  function validatePaymentForm() {
+    const paymentForm = document.querySelector("[data-mock-payment]");
+    if (!paymentForm) return true;
+    const requiredFields = paymentForm.querySelectorAll("[data-payment-input]");
+    return Array.from(requiredFields).every((input) => input.value.trim().length);
+  }
+
+  function buildOrderPayload() {
+    const { subtotal, discount, shipping, total } = calculateTotals();
+    return {
+      items: Object.entries(cart).map(([key, quantity]) => ({
+        id: key,
+        name: PRODUCT_CATALOG[key].name,
+        price: PRODUCT_CATALOG[key].price,
+        quantity,
+        lineTotal: PRODUCT_CATALOG[key].price * quantity
+      })),
+      total,
+      discount,
+      shipping,
+      subtotal,
+      shippingLabel: getSelectedShippingLabel(),
+      addressLabel: getSelectedAddressLabel()
+    };
+  }
+
+  function simulateOrderRequest(payload) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({
+          orderId: `AX-${Math.floor(Math.random() * 900000) + 100000}`,
+          ...payload
+        });
+      }, 1000);
+    });
+  }
+
+  function renderConfirmation(order) {
+    if (!confirmationCard || !confirmationId || !confirmationItems || !confirmationSummary || !confirmationTotal) return;
+
+    confirmationCard.classList.remove("is-hidden");
+    confirmationId.textContent = order.orderId;
+    confirmationSummary.textContent = `Shipping to ${order.addressLabel} via ${order.shippingLabel}.`;
+    confirmationItems.innerHTML = "";
+
+    order.items.forEach((item) => {
+      const li = document.createElement("li");
+      li.innerHTML = `<span>${item.name} × ${item.quantity}</span><span>${formatCurrency(item.lineTotal)}</span>`;
+      confirmationItems.appendChild(li);
+    });
+
+    confirmationTotal.textContent = formatCurrency(order.total);
+  }
+
+  function clearCart() {
+    cart = {};
+    persistCart();
+  }
+
+  function showStatus(message, tone = "info") {
+    if (!checkoutStatus) return;
+    checkoutStatus.textContent = message;
+    checkoutStatus.dataset.tone = tone;
+  }
 });

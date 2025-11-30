@@ -60,7 +60,7 @@
           </div>
           <div class="selection-grid">
             <label class="selection-card">
-              <input type="radio" name="shipping" value="ground" data-shipping-cost="6" checked>
+              <input type="radio" name="shipping" value="ground" data-shipping-label="Ground (2-4 business days)" data-shipping-cost="6" checked>
               <div class="selection-card__content">
                 <div class="selection-card__title">Ground (2-4 business days)</div>
                 <p>Trackable delivery with signature on arrival.</p>
@@ -68,7 +68,7 @@
               <div class="selection-card__price">$6</div>
             </label>
             <label class="selection-card">
-              <input type="radio" name="shipping" value="express" data-shipping-cost="16">
+              <input type="radio" name="shipping" value="express" data-shipping-label="Express (1-2 business days)" data-shipping-cost="16">
               <div class="selection-card__content">
                 <div class="selection-card__title">Express (1-2 business days)</div>
                 <p>Priority handling and overnight line haul where available.</p>
@@ -76,7 +76,7 @@
               <div class="selection-card__price">$16</div>
             </label>
             <label class="selection-card">
-              <input type="radio" name="shipping" value="pickup" data-shipping-cost="0">
+              <input type="radio" name="shipping" value="pickup" data-shipping-label="Will-call pickup" data-shipping-cost="0">
               <div class="selection-card__content">
                 <div class="selection-card__title">Will-call pickup</div>
                 <p>Reserve inventory and pick up curbside at Axen Labs HQ.</p>
@@ -102,6 +102,27 @@
               <li>Address verification syncs with the selected shipping address</li>
               <li>Real-time validation and error states baked in</li>
             </ul>
+            <form class="payment-form" data-mock-payment>
+              <div class="form-row">
+                <label for="card-name">Name on card</label>
+                <input id="card-name" type="text" name="card-name" placeholder="Dr. Ada Lovelace" data-payment-input>
+              </div>
+              <div class="form-grid">
+                <div class="form-row">
+                  <label for="card-number">Card number</label>
+                  <input id="card-number" type="text" inputmode="numeric" maxlength="19" placeholder="4242 4242 4242 4242" data-payment-input>
+                </div>
+                <div class="form-row">
+                  <label for="card-exp">Exp.</label>
+                  <input id="card-exp" type="text" inputmode="numeric" maxlength="5" placeholder="12/29" data-payment-input>
+                </div>
+                <div class="form-row">
+                  <label for="card-cvv">CVV</label>
+                  <input id="card-cvv" type="text" inputmode="numeric" maxlength="4" placeholder="123" data-payment-input>
+                </div>
+              </div>
+              <p class="fine-print">Test mode only: data stays in your browser and no payment is processed.</p>
+            </form>
           </div>
         </div>
       </div>
@@ -172,8 +193,21 @@
             </div>
           </div>
 
-          <button class="cta-primary cta-primary--full" type="button">Place order</button>
+          <button class="cta-primary cta-primary--full" type="button" data-place-order>Place order</button>
           <p class="fine-print">By placing your order, you agree to Axen Labs' terms and privacy practices. Taxes are calculated at shipment.</p>
+          <div class="checkout-status" data-checkout-status aria-live="polite">Ready to simulate your order.</div>
+          <div class="confirmation-card is-hidden" data-confirmation>
+            <div class="confirmation-header">
+              <div>
+                <p class="eyebrow">Simulation complete</p>
+                <h3>Order confirmed</h3>
+              </div>
+              <div class="confirmation-pill" data-confirmation-id>AX-000000</div>
+            </div>
+            <p class="confirmation-summary" data-confirmation-summary>Shipping to your selected address.</p>
+            <ul class="confirmation-items" data-confirmation-items></ul>
+            <div class="confirmation-total">Total charged: <span data-confirmation-total>$0.00</span></div>
+          </div>
         </div>
       </aside>
     </section>
