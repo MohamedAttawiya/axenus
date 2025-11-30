@@ -4,7 +4,8 @@
     toggleCartBtn,
     clearCartBtn,
     checkoutBtn,
-    totalPriceContainer;
+    totalPriceContainer,
+    headerCart;
   let initialized = false;
 
   const currency = (value) => {
@@ -24,6 +25,7 @@
     clearCartBtn = document.querySelector("#clear-cart");
     checkoutBtn = document.querySelector("#checkout-btn");
     totalPriceContainer = document.querySelector("#total-price");
+    headerCart = document.querySelector(".header__cart");
   }
 
   function toggleCart() {
@@ -33,6 +35,14 @@
 
     if (toggleCartBtn) {
       toggleCartBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    }
+  }
+
+  function closeCart() {
+    if (!cartContainer) return;
+    cartContainer.classList.remove("open");
+    if (toggleCartBtn) {
+      toggleCartBtn.setAttribute("aria-expanded", "false");
     }
   }
 
@@ -151,6 +161,17 @@
         toggleCart();
       });
     }
+
+    if (headerCart) {
+      headerCart.addEventListener("click", function(e) {
+        e.stopPropagation();
+      });
+    }
+
+    document.addEventListener("click", function(e) {
+      if (!headerCart || headerCart.contains(e.target)) return;
+      closeCart();
+    });
 
     document.addEventListener("click", function(e) {
       const btn = e.target.closest(".add-to-cart");
