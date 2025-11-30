@@ -188,10 +188,6 @@ function initFortuneWheel() {
     overlay.classList.add("visible");
   });
 
-  setTimeout(() => {
-    spinFortuneWheel(overlay);
-  }, 700);
-
   localStorage.setItem("axen-fortune-wheel", Date.now().toString());
 }
 
@@ -209,10 +205,10 @@ function buildFortuneWheel() {
       <button class="fortune-close" aria-label="Close offer wheel">×</button>
       <div class="fortune-grid">
         <div class="fortune-copy">
-          <p class="eyebrow">You unlocked a lab-only drop</p>
+          <p class="eyebrow">Site Wide Coupon!</p>
           <h3>Spin for an Axen Labs bonus</h3>
-          <p>Every slot is engineered for builders, but this wheel is rigged in your favor. Give it a whirl and claim your reward.</p>
-          <div class="fortune-result">Locking in your reward...</div>
+          <p>Every slot is engineered for builders, but this wheel is rigged in your favor. Spin to reveal the lab’s best offer.</p>
+          <div class="fortune-result">Tap spin to reveal your reward. Your coupon will auto-apply at checkout.</div>
         </div>
         <div class="fortune-wheel-stack">
           <div class="fortune-pointer" aria-hidden="true"></div>
@@ -220,7 +216,7 @@ function buildFortuneWheel() {
             <ul class="fortune-slices">${offerList}</ul>
           </div>
           <button class="fortune-spin" type="button">Spin now</button>
-          <p class="fortune-note">New visitors always land a 20% off win. Welcome to the lab.</p>
+          <p class="fortune-note">Your 20% coupon will be applied automatically at checkout.</p>
         </div>
       </div>
     </div>
@@ -236,10 +232,21 @@ function buildFortuneWheel() {
 
   const spinBtn = overlay.querySelector(".fortune-spin");
   if (spinBtn) {
-    spinBtn.addEventListener("click", () => spinFortuneWheel(overlay));
+    spinBtn.addEventListener("click", () => handleFortuneSpin(overlay));
   }
 
   return overlay;
+}
+
+function handleFortuneSpin(overlay) {
+  if (overlay.dataset.state === "spinning") return;
+
+  if (overlay.dataset.state === "won") {
+    overlay.remove();
+    return;
+  }
+
+  spinFortuneWheel(overlay);
 }
 
 function spinFortuneWheel(overlay) {
@@ -249,8 +256,11 @@ function spinFortuneWheel(overlay) {
 
   if (!wheel || !result) return;
 
+  overlay.dataset.state = "spinning";
+
   if (spinBtn) {
     spinBtn.disabled = true;
+    spinBtn.textContent = "Spinning...";
   }
 
   const winningIndex = FORTUNE_OFFERS.findIndex((offer) => offer.isWinner);
@@ -263,10 +273,12 @@ function spinFortuneWheel(overlay) {
   wheel.classList.add("spinning");
 
   setTimeout(() => {
-    result.innerHTML = `<span class="fortune-hit">You won 20% off.</span> Use code <strong>LAB20</strong> at checkout.`;
+    result.innerHTML = `<span class="fortune-hit">You won 20% off.</span> Code <strong>LAB20</strong> will auto-apply at checkout.`;
     overlay.classList.add("won");
+    overlay.dataset.state = "won";
     if (spinBtn) {
-      spinBtn.textContent = "20% locked in";
+      spinBtn.textContent = "Continue Shopping";
+      spinBtn.disabled = false;
     }
   }, 4200);
 }
