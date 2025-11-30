@@ -39,7 +39,9 @@
   .header .header__cart .header__submenu .shopping-cart-container.open {
     animation: fade-down 0.3s forwards;
     visibility: visible;
-    pointer-events: auto; }
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0); }
 
 .header .header__cart {
   position: relative;
@@ -58,7 +60,8 @@
   border: 2px solid #ea332a;
   padding: 0.8em;
   font-size: 1rem;
-  border-radius: 5px; }
+  border-radius: 5px;
+  color: #fff; }
   .header .header__cart .header__cart-btn:hover, .header .header__cart .header__cart-btn:focus {
     border: 3px solid #b61a12; }
 

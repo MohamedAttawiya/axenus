@@ -7,6 +7,7 @@
     totalPriceContainer,
     headerCart;
   let initialized = false;
+  let cartObserver;
 
   const currency = (value) => {
     const num = Number(value);
@@ -217,12 +218,41 @@
 
   function init() {
     hydrateElements();
-    if (!cartContent) return;
-    displayProducts();
-    displayCartTotal();
-    bindEvents();
+
+    if (cartContent) {
+      displayProducts();
+      displayCartTotal();
+      bindEvents();
+      if (cartObserver) {
+        cartObserver.disconnect();
+        cartObserver = null;
+      }
+      return;
+    }
+
+    if (!cartObserver) {
+      cartObserver = new MutationObserver(() => {
+        hydrateElements();
+        if (cartContent) {
+          displayProducts();
+          displayCartTotal();
+          bindEvents();
+          cartObserver.disconnect();
+          cartObserver = null;
+        }
+      });
+
+      cartObserver.observe(document.body || document.documentElement, {
+        childList: true,
+        subtree: true
+      });
+    }
   }
 
   document.addEventListener("DOMContentLoaded", init);
   document.addEventListener("header:loaded", init);
+
+  if (document.readyState !== "loading") {
+    init();
+  }
 })();
