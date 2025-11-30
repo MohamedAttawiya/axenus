@@ -49,7 +49,17 @@ const PRODUCT_AVAILABILITY = {
 document.addEventListener("DOMContentLoaded", () => {
   console.log("Axen Labs website loaded.");
   hydrateProductUrgency();
+  initFortuneWheel();
 });
+
+const FORTUNE_OFFERS = [
+  { label: "Rush Lab Handling", detail: "Orders skip the standard queue" },
+  { label: "Sample Vial Add-On", detail: "Complimentary testing vial" },
+  { label: "Concierge Tuning Notes", detail: "Build-specific mixing cues" },
+  { label: "20% Off Sitewide", detail: "Use code LAB20 today", isWinner: true },
+  { label: "Pro Driver Sticker Pack", detail: "Track-inspired decals" },
+  { label: "Expedited Fulfillment", detail: "Same-day lab release" }
+];
 
 function hydrateProductUrgency() {
   const panels = document.querySelectorAll("[data-product-stats]");
@@ -164,4 +174,99 @@ function randomBetween(min, max) {
 
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
+}
+
+// ========== Fortune Wheel ========== //
+function initFortuneWheel() {
+  if (!document.body) return;
+  if (localStorage.getItem("axen-fortune-wheel")) return;
+
+  const overlay = buildFortuneWheel();
+  document.body.appendChild(overlay);
+
+  window.requestAnimationFrame(() => {
+    overlay.classList.add("visible");
+  });
+
+  setTimeout(() => {
+    spinFortuneWheel(overlay);
+  }, 700);
+
+  localStorage.setItem("axen-fortune-wheel", Date.now().toString());
+}
+
+function buildFortuneWheel() {
+  const overlay = document.createElement("div");
+  overlay.className = "fortune-overlay";
+
+  const offerList = FORTUNE_OFFERS.map(
+    (offer, index) =>
+      `<li style="--i:${index}"><strong>${offer.label}</strong><span>${offer.detail}</span></li>`
+  ).join("");
+
+  overlay.innerHTML = `
+    <div class="fortune-modal" role="dialog" aria-label="Axen Labs offer wheel" aria-modal="true">
+      <button class="fortune-close" aria-label="Close offer wheel">×</button>
+      <div class="fortune-grid">
+        <div class="fortune-copy">
+          <p class="eyebrow">You unlocked a lab-only drop</p>
+          <h3>Spin for an Axen Labs bonus</h3>
+          <p>Every slot is engineered for builders, but this wheel is rigged in your favor. Give it a whirl and claim your reward.</p>
+          <div class="fortune-result">Locking in your reward...</div>
+        </div>
+        <div class="fortune-wheel-stack">
+          <div class="fortune-pointer" aria-hidden="true"></div>
+          <div class="fortune-wheel" aria-hidden="true">
+            <ul class="fortune-slices">${offerList}</ul>
+          </div>
+          <button class="fortune-spin" type="button">Spin now</button>
+          <p class="fortune-note">New visitors always land a 20% off win. Welcome to the lab.</p>
+        </div>
+      </div>
+    </div>
+  `;
+
+  overlay.addEventListener("click", (evt) => {
+    if (evt.target === overlay) {
+      overlay.remove();
+    }
+  });
+
+  overlay.querySelector(".fortune-close")?.addEventListener("click", () => overlay.remove());
+
+  const spinBtn = overlay.querySelector(".fortune-spin");
+  if (spinBtn) {
+    spinBtn.addEventListener("click", () => spinFortuneWheel(overlay));
+  }
+
+  return overlay;
+}
+
+function spinFortuneWheel(overlay) {
+  const wheel = overlay.querySelector(".fortune-wheel");
+  const result = overlay.querySelector(".fortune-result");
+  const spinBtn = overlay.querySelector(".fortune-spin");
+
+  if (!wheel || !result) return;
+
+  if (spinBtn) {
+    spinBtn.disabled = true;
+  }
+
+  const winningIndex = FORTUNE_OFFERS.findIndex((offer) => offer.isWinner);
+  const sliceAngle = 360 / FORTUNE_OFFERS.length;
+  const buffer = 6;
+  const padding = randomBetween(buffer, sliceAngle - buffer);
+  const targetRotation = 360 * 5 + winningIndex * sliceAngle + padding;
+
+  wheel.style.setProperty("--fortune-rotation", `${targetRotation}deg`);
+  wheel.classList.add("spinning");
+
+  setTimeout(() => {
+    result.innerHTML = `<span class="fortune-hit">You won 20% off.</span> Use code <strong>LAB20</strong> at checkout.`;
+    overlay.classList.add("won");
+    if (spinBtn) {
+      spinBtn.textContent = "20% locked in";
+    }
+  }, 4200);
 }
