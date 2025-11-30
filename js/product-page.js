@@ -1,14 +1,6 @@
-import { Cart } from "./cart.js";
 import { getOrCreateSessionId } from "./session.js";
 
 const readBtn = b => ({ id:b.dataset.id, name:b.dataset.name, price:parseFloat(b.dataset.price), image:b.dataset.image });
-
-document.querySelectorAll(".add-to-cart").forEach(btn=>{
-  btn.addEventListener("click", ()=>{
-    Cart.add({ ...readBtn(btn), qty: 1 });
-    // optional: show toast / mini-cart count
-  });
-});
 
 document.querySelectorAll(".buy-now").forEach(btn=>{
   btn.addEventListener("click", ()=>{

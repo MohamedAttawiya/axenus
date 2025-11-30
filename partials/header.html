@@ -1,4 +1,4 @@
-<header class="site-header">
+<header class="site-header header">
   <nav class="navbar">
     <a href="index.html" class="logo">
       <img src="assets/images/brand/FullColor_Horizontal_Primary.png" alt="Axen Labs logo">
@@ -18,5 +18,29 @@
       <li><a href="certification-quality.html">Certification & Quality</a></li>
       <li><a href="contact.html">Contact</a></li>
     </ul>
+
+    <div class="header__cart">
+      <button id="toggle-cart-btn" class="header__cart-btn" aria-haspopup="true" aria-expanded="false">
+        <span class="cart" aria-hidden="true">🛒</span> Cart
+      </button>
+      <div class="header__submenu">
+        <div id="shopping-cart" class="shopping-cart-container" aria-live="polite">
+          <table id="cart-content" aria-label="Shopping cart">
+            <thead>
+              <tr>
+                <th scope="col">Item</th>
+                <th scope="col">Name</th>
+                <th scope="col">Price</th>
+                <th scope="col">Remove</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <div class="total-container" id="total-price"><span class="total">Total: $0.00</span></div>
+          <a href="#" class="cart-btn" id="clear-cart">Clear Cart</a>
+          <a href="checkout.html" class="cart-btn" id="checkout-btn">Checkout</a>
+        </div>
+      </div>
+    </div>
   </nav>
 </header>

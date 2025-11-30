@@ -1,267 +1,207 @@
 (function() {
-  // VARS
-  const productsContainer = document.querySelector("#grid");
-  const cartContainer = document.querySelector("#shopping-cart");
-  const cartContent = document.querySelector("#cart-content");
-  const toggleCartBtn = document.querySelector("#toggle-cart-btn");
-  const clearCartBtn = document.querySelector("#clear-cart");
-  const checkoutBtn = document.querySelector("#checkout-btn");
-  const totalPriceContainer = document.querySelector("#total-price");
+  let cartContainer,
+    cartContent,
+    toggleCartBtn,
+    clearCartBtn,
+    checkoutBtn,
+    totalPriceContainer;
+  let initialized = false;
 
-  // FUNCTIONS
+  const currency = (value) => {
+    const num = Number(value);
+    return Number.isFinite(num) ? `$${num.toFixed(2)}` : "$0.00";
+  };
+
+  const parsePrice = (value) => {
+    const num = Number(String(value).replace(/[^\d.]/g, ""));
+    return Number.isFinite(num) ? num : 0;
+  };
+
+  function hydrateElements() {
+    cartContainer = document.querySelector("#shopping-cart");
+    cartContent = document.querySelector("#cart-content");
+    toggleCartBtn = document.querySelector("#toggle-cart-btn");
+    clearCartBtn = document.querySelector("#clear-cart");
+    checkoutBtn = document.querySelector("#checkout-btn");
+    totalPriceContainer = document.querySelector("#total-price");
+  }
 
   function toggleCart() {
-    // toggle shopping cart visibility
-    cartContainer.classList.toggle("open");
+    if (!cartContainer) return;
+
+    const isOpen = cartContainer.classList.toggle("open");
+
+    if (toggleCartBtn) {
+      toggleCartBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    }
   }
 
   function getLSContent() {
-    // get contents from local storage.
-    // if nothing is there, create an empty array
     const lsContent = JSON.parse(localStorage.getItem("products")) || [];
-    return lsContent;
+    return Array.isArray(lsContent)
+      ? lsContent.map((item) => ({
+          ...item,
+          price: parsePrice(item.price),
+          qty: Number(item.qty) || 1
+        }))
+      : [];
   }
 
   function setLSContent(lsContent) {
-    // save content inside local storage
     localStorage.setItem("products", JSON.stringify(lsContent));
   }
 
-  function calculateTotal(prices) {
-    // calculate the total price in the cart
-    return prices.reduce(function(prev, next) {
-      return prev + next;
-    }, 0);
-  }
-
-  function getCartItemPrices() {
-    // extract the price numbers from the cart items to calculate total
-    const prices = [];
-    // retrieve the td element in the cart where the product price is stored
-    // for each product in the cart
-    let nums = cartContent.querySelectorAll("tr td:nth-child(3)");
-
-    // iterate over each td node and extract the price
-    // strip the $ sign from the text, turn the string into
-    // a number and push the number into the prices array
-    if (nums.length > 0) {
-      for (let cell = 0; cell < nums.length; cell++) {
-        let num = nums[cell].innerText;
-        num = num.replace(/[^\d]/g, "");
-        num = parseFloat(num);
-        prices.push(num);
-      }
-      // return the prices array
-      return prices;
-    } else {
-      return;
-    }
-  }
-
   function displayCartTotal() {
-    // display the total cost in the cart
-    const prices = getCartItemPrices();
-    let total = 0;
-    if (prices) {
-      total = calculateTotal(prices);
-      totalPriceContainer.innerHTML = `<span class="total">Total: $${total.toFixed(
-        2
-      )}</span>`;
-    } else {
-      totalPriceContainer.innerHTML = '<span class="total">Total: $0</span>';
-    }
+    if (!totalPriceContainer) return;
+    const lsContent = getLSContent();
+    const total = lsContent.reduce((sum, item) => sum + item.price * item.qty, 0);
+    totalPriceContainer.innerHTML = `<span class="total">Total: ${currency(total)}</span>`;
   }
 
   function displayProducts() {
-    // display all products in the cart
+    if (!cartContent) return;
 
-    // get contents from local storage
     const lsContent = getLSContent();
     let productMarkup = "";
-    // if local storage is not empty, build the
-    // cart items markup and the appropriate details
-    if (lsContent !== null) {
+
+    if (lsContent.length) {
       for (let product of lsContent) {
+        const qty = product.qty || 1;
         productMarkup += `
           <tr>
-          <td><img class="cart-image" src="${product.image}" alt="${
-          product.name
-        }" width="120"></td>
-          <td>
-            ${product.name}
-          </td>
-          <td>${product.price}</td>
-          <td><a href="#" data-id="${product.id}" class="remove">X</a></td>
+            <td><img class="cart-image" src="${product.image}" alt="${product.name}" width="120"></td>
+            <td>
+              ${product.name}
+              ${qty > 1 ? `<div class="cart-qty">Qty ${qty}</div>` : ""}
+            </td>
+            <td>${currency(product.price * qty)}</td>
+            <td><a href="#" data-id="${product.id}" class="remove" aria-label="Remove ${product.name}">X</a></td>
           </tr>
         `;
       }
     } else {
-      // if no content is in local storage, alert user
-      productMarkup = "Your cart is empty.";
+      productMarkup = '<tr><td colspan="4">Your cart is empty.</td></tr>';
     }
-    // add markup to DOM
-    cartContent.querySelector("tbody").innerHTML = productMarkup;
+
+    const body = cartContent.querySelector("tbody");
+    if (body) {
+      body.innerHTML = productMarkup;
+    }
   }
 
   function saveProduct(clickedBtn) {
-    // save selected product in local storage and display it in the cart together
-
-    // vars
     const productId = clickedBtn.getAttribute("data-id");
-    const card = clickedBtn.parentElement.parentElement;
-    const cardInfo = clickedBtn.parentElement;
-    const prodImage = card.querySelector("img").src;
-    const prodName = cardInfo.querySelector("h4").textContent;
-    const prodPrice = cardInfo.querySelector(".card__price").textContent;
+    const prodImage = clickedBtn.getAttribute("data-image") || clickedBtn.closest("article, section, main")?.querySelector("img")?.src || "";
+    const prodName = clickedBtn.getAttribute("data-name") || clickedBtn.dataset.title || clickedBtn.textContent.trim();
+    const prodPrice = parsePrice(clickedBtn.getAttribute("data-price"));
 
-    let isProductInCart = false;
-
-    // get local storage array
     const lsContent = getLSContent();
+    const existing = lsContent.find((product) => product.id === productId);
 
-    // to avoid user adds the same course twice, check
-    // the product is not in LS already before adding it
-    lsContent.forEach(function(product) {
-      if (product.id === productId) {
-        alert("This course is already in your cart.");
-        isProductInCart = true;
-      }
-    });
-
-    // only if the product is not already in the cart,
-    // create an object representing selected product info
-    // and push it into local storage array
-    if (!isProductInCart) {
+    if (existing) {
+      existing.qty = (existing.qty || 1) + 1;
+    } else {
       lsContent.push({
         id: productId,
         image: prodImage,
         name: prodName,
-        price: prodPrice
+        price: prodPrice,
+        qty: 1
       });
-
-      // add product into into local storage
-      setLSContent(lsContent);
-      // update the display of courses in the shopping cart
-      displayProducts();
     }
+
+    setLSContent(lsContent);
+    displayProducts();
+    displayCartTotal();
   }
 
   function removeProduct(productId) {
-    // remove product from cart (and from local storage)
-
-    // retrieve list of products from LS
     const lsContent = getLSContent();
-
-    // get the index of the product item to remove
-    // inside the local storage content array
-    let productIndex;
-    lsContent.forEach(function(product, i) {
-      if (product.id === productId) {
-        productIndex = i;
-      }
-    });
-
-    // modify the items in local storage array
-    // to remove the selected product item
-
-    lsContent.splice(productIndex, 1);
-    // update local storage content
-    setLSContent(lsContent);
-
+    const updated = lsContent.filter((product) => product.id !== productId);
+    setLSContent(updated);
     displayProducts();
+    displayCartTotal();
   }
 
   function clearCart() {
-    // clear all products from cart (and local storage)
-
-    // retrieve list of products from LS
-    const lsContent = getLSContent();
-    // empty array in local storage
-    lsContent.splice(0, lsContent.length);
-    // update local storage
-    setLSContent(lsContent);
-    // display cart content again
+    setLSContent([]);
     displayProducts();
+    displayCartTotal();
   }
 
   function checkout() {
-    // checkout: just clear the cart
-    // after user confirms the checkout process
-    const cartProducts = cartContent.querySelector("tbody").innerHTML;
-    if (cartProducts !== "" && confirm("Are you sure you want to checkout?")) {
-      clearCart();
-    } else {
+    const lsContent = getLSContent();
+    if (!lsContent.length) {
+      alert("Your cart is empty.");
       return;
     }
+
+    window.location.href = "checkout.html";
   }
 
-  // BIND EVENTS AND CALL FUNCTIONS
+  function bindEvents() {
+    if (initialized) return;
+    if (!cartContent) return;
 
-  // Page load:
-  document.addEventListener("DOMContentLoaded", function(e) {
-    // display list of products in cart, if any, on page load
+    initialized = true;
+
+    if (toggleCartBtn) {
+      toggleCartBtn.addEventListener("click", function(e) {
+        e.preventDefault();
+        toggleCart();
+      });
+    }
+
+    document.addEventListener("click", function(e) {
+      const btn = e.target.closest(".add-to-cart");
+      if (btn) {
+        e.preventDefault();
+        saveProduct(btn);
+      }
+    });
+
+    const cartBody = cartContent.querySelector("tbody");
+    if (cartBody) {
+      cartBody.addEventListener("click", function(e) {
+        const clickedBtn = e.target;
+        if (clickedBtn.classList.contains("remove")) {
+          e.preventDefault();
+          const productId = clickedBtn.getAttribute("data-id");
+          removeProduct(productId);
+        }
+      });
+    }
+
+    if (clearCartBtn) {
+      clearCartBtn.addEventListener("click", function(e) {
+        e.preventDefault();
+        clearCart();
+      });
+    }
+
+    if (checkoutBtn) {
+      checkoutBtn.addEventListener("click", function(e) {
+        e.preventDefault();
+        checkout();
+      });
+    }
+
+    window.addEventListener("storage", function(event) {
+      if (event.key === "products") {
+        displayProducts();
+        displayCartTotal();
+      }
+    });
+  }
+
+  function init() {
+    hydrateElements();
+    if (!cartContent) return;
     displayProducts();
-    // display cart total
     displayCartTotal();
-  });
+    bindEvents();
+  }
 
-  // open and close shopping cart
-  // when cart button is clicked
-  toggleCartBtn.addEventListener("click", function(e) {
-    e.preventDefault();
-    toggleCart();
-  });
-
-  // Save product in cart and Local Storage
-  // when add to cart button is clicked
-  productsContainer.addEventListener("click", function(e) {
-    if (e.target.classList.contains("add-to-cart")) {
-      e.preventDefault();
-      const clickedBtn = e.target;
-      saveProduct(clickedBtn);
-    }
-  });
-
-  productsContainer.addEventListener("click", function(e) {
-    if (e.target.classList.contains("add-to-cart")) {
-      displayCartTotal();
-    }
-  });
-
-  // bind removeProduct to click event of the cartContent table
-  cartContent.querySelector("tbody").addEventListener("click", function(e) {
-    e.preventDefault();
-    // identify the button that was clicked
-    const clickedBtn = e.target;
-    // if it's a remove button
-    if (e.target.classList.contains("remove")) {
-      // get the value of the data-id property, which contains the
-      // id of the selected product
-      const productId = clickedBtn.getAttribute("data-id");
-      // use the id to remove the selected product
-      removeProduct(productId);
-      // display products in the cart again,
-      // now the list should be displayed with 1 less product
-      // or empty if no products are left in the cart
-
-      // adjust the total
-      displayCartTotal();
-    }
-  });
-
-  // bind the button to clear the cart both to the function that
-  // clears the cart and to the function that adjusts the total price
-  clearCartBtn.addEventListener("click", function(e) {
-    e.preventDefault();
-    clearCart();
-  });
-  clearCartBtn.addEventListener("click", displayCartTotal);
-
-  // bind the button that does the checkout both to the function that
-  // controls the checkout and and to the function that adjusts the total price
-  checkoutBtn.addEventListener("click", function(e) {
-    e.preventDefault();
-    checkout();
-  });
-  checkoutBtn.addEventListener("click", displayCartTotal);
+  document.addEventListener("DOMContentLoaded", init);
+  document.addEventListener("header:loaded", init);
 })();
