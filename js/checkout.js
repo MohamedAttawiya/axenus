@@ -1,16 +1,12 @@
-const PRODUCT_CATALOG = {
-  absolu: { name: "ETHRIX Absolu", price: 89 },
-  flux: { name: "ETHRIX Flux", price: 64 },
-  shield: { name: "Axion Shield", price: 48 }
-};
-
-const DISCOUNT_RATE = 0.2;
-const CART_STORAGE_KEY = "axen-demo-cart";
 const SHIPPING_STORAGE_KEY = "axen-demo-shipping";
 const ADDRESS_STORAGE_KEY = "axen-demo-address";
 
 window.addEventListener("DOMContentLoaded", () => {
-  let cart = loadCartFromStorage();
+  const cartAPI = window.AxenCart;
+  const PRODUCT_CATALOG = cartAPI?.PRODUCT_CATALOG || {};
+  const DISCOUNT_RATE = cartAPI?.DISCOUNT_RATE ?? 0;
+
+  let cart = cartAPI ? cartAPI.getCart() : {};
   let shippingCost = getSelectedShippingCost();
 
   const cartList = document.querySelector("[data-cart-items]");
@@ -32,11 +28,13 @@ window.addEventListener("DOMContentLoaded", () => {
   renderCart();
   renderTotals();
 
-  document.querySelectorAll("[data-add-product]").forEach((button) => {
-    button.addEventListener("click", () => {
-      addToCart(button.dataset.addProduct);
+  if (cartAPI) {
+    window.addEventListener("cart:updated", (event) => {
+      cart = event.detail?.cart || {};
+      renderCart();
+      renderTotals();
     });
-  });
+  }
 
   document.querySelectorAll('input[name="shipping"]').forEach((input) => {
     input.addEventListener("change", () => {
@@ -72,7 +70,16 @@ window.addEventListener("DOMContentLoaded", () => {
       setProcessing(true);
       showStatus("Simulating checkout...", "info");
 
-      const orderPayload = buildOrderPayload();
+      const orderPayload = cartAPI
+        ? cartAPI.buildCheckoutPayload({
+            cartOverride: cart,
+            shippingCost,
+            shippingLabel: getSelectedShippingLabel(),
+            addressLabel: getSelectedAddressLabel(),
+            discountRate: DISCOUNT_RATE
+          })
+        : buildOrderPayloadFallback();
+
       const response = await simulateOrderRequest(orderPayload);
 
       renderConfirmation(response);
@@ -82,15 +89,6 @@ window.addEventListener("DOMContentLoaded", () => {
       setProcessing(false);
       showStatus("Order simulation complete. Confirmation generated below.", "success");
     });
-  }
-
-  function addToCart(productKey) {
-    if (!PRODUCT_CATALOG[productKey]) return;
-
-    cart[productKey] = (cart[productKey] || 0) + 1;
-    persistCart();
-    renderCart();
-    renderTotals();
   }
 
   function renderCart() {
@@ -120,15 +118,16 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  function calculateSubtotal() {
-    return Object.entries(cart).reduce((total, [key, qty]) => {
+  function calculateTotals() {
+    if (cartAPI && typeof cartAPI.calculateTotals === "function") {
+      return cartAPI.calculateTotals(cart, shippingCost, DISCOUNT_RATE);
+    }
+
+    const subtotal = Object.entries(cart).reduce((total, [key, qty]) => {
       const product = PRODUCT_CATALOG[key];
       return total + product.price * qty;
     }, 0);
-  }
 
-  function calculateTotals() {
-    const subtotal = calculateSubtotal();
     const discount = subtotal * DISCOUNT_RATE;
     const shipping = subtotal > 0 ? shippingCost : 0;
     const total = subtotal - discount + shipping;
@@ -166,10 +165,6 @@ window.addEventListener("DOMContentLoaded", () => {
     return checked ? checked.dataset.addressLabel || checked.value : "";
   }
 
-  function persistCart() {
-    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
-  }
-
   function persistShippingSelection(value) {
     localStorage.setItem(SHIPPING_STORAGE_KEY, value);
   }
@@ -178,26 +173,9 @@ window.addEventListener("DOMContentLoaded", () => {
     localStorage.setItem(ADDRESS_STORAGE_KEY, value);
   }
 
-  function loadCartFromStorage() {
-    try {
-      const raw = localStorage.getItem(CART_STORAGE_KEY);
-      if (!raw) return {};
-      const parsed = JSON.parse(raw);
-      return Object.keys(parsed || {}).reduce((acc, key) => {
-        if (PRODUCT_CATALOG[key]) {
-          acc[key] = Number(parsed[key]) || 0;
-        }
-        return acc;
-      }, {});
-    } catch (e) {
-      return {};
-    }
-  }
-
   function hydrateShippingFromStorage() {
     const stored = localStorage.getItem(SHIPPING_STORAGE_KEY);
-    if (!stored) return;
-    const match = document.querySelector(`input[name="shipping"][value="${stored}"]`);
+    const match = stored ? document.querySelector(`input[name="shipping"][value="${stored}"]`) : null;
     if (match) {
       match.checked = true;
       shippingCost = getSelectedShippingCost();
@@ -228,7 +206,7 @@ window.addEventListener("DOMContentLoaded", () => {
     return Array.from(requiredFields).every((input) => input.value.trim().length);
   }
 
-  function buildOrderPayload() {
+  function buildOrderPayloadFallback() {
     const { subtotal, discount, shipping, total } = calculateTotals();
     return {
       items: Object.entries(cart).map(([key, quantity]) => ({
@@ -276,8 +254,13 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   function clearCart() {
+    if (cartAPI) {
+      cartAPI.clear();
+      cart = cartAPI.getCart();
+      return;
+    }
+
     cart = {};
-    persistCart();
   }
 
   function showStatus(message, tone = "info") {
