@@ -21,24 +21,33 @@
 
     <div class="header__cart">
       <button id="toggle-cart-btn" class="header__cart-btn" aria-haspopup="true" aria-expanded="false">
-        <span class="cart" aria-hidden="true">🛒</span> Cart
+        <span class="cart" aria-hidden="true">🛒</span>
+        <span class="cart-label">Cart</span>
+        <span class="cart-count" id="cart-count" aria-live="polite">0</span>
       </button>
       <div class="header__submenu">
         <div id="shopping-cart" class="shopping-cart-container" aria-live="polite">
-          <table id="cart-content" aria-label="Shopping cart">
-            <thead>
-              <tr>
-                <th scope="col">Item</th>
-                <th scope="col">Name</th>
-                <th scope="col">Price</th>
-                <th scope="col">Remove</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-          <div class="total-container" id="total-price"><span class="total">Total: $0.00</span></div>
-          <a href="#" class="cart-btn" id="clear-cart">Clear Cart</a>
-          <a href="checkout.html" class="cart-btn" id="checkout-btn">Checkout</a>
+          <div class="cart-header">
+            <div>
+              <p class="cart-title">Your cart</p>
+              <p class="cart-subtitle">Recently added products</p>
+            </div>
+            <span class="cart-count-badge" id="cart-count-inline">0 items</span>
+          </div>
+
+          <div id="cart-content" class="cart-list" role="list"></div>
+          <div class="cart-empty" id="cart-empty" aria-live="polite">Your cart is empty.</div>
+
+          <div class="cart-footer">
+            <div class="total-row">
+              <span>Subtotal</span>
+              <span class="total" id="total-price">$0.00</span>
+            </div>
+            <div class="cart-actions">
+              <button class="cart-btn ghost" id="clear-cart" type="button">Clear Cart</button>
+              <a href="checkout.html" class="cart-btn primary" id="checkout-btn">Checkout</a>
+            </div>
+          </div>
         </div>
       </div>
     </div>

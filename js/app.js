@@ -5,7 +5,11 @@
     clearCartBtn,
     checkoutBtn,
     totalPriceContainer,
-    headerCart;
+    headerCart,
+    cartEmpty,
+    cartCount,
+    cartCountInline,
+    toastContainer;
   let initialized = false;
   let cartObserver;
 
@@ -27,6 +31,9 @@
     checkoutBtn = document.querySelector("#checkout-btn");
     totalPriceContainer = document.querySelector("#total-price");
     headerCart = document.querySelector(".header__cart");
+    cartEmpty = document.querySelector("#cart-empty");
+    cartCount = document.querySelector("#cart-count");
+    cartCountInline = document.querySelector("#cart-count-inline");
   }
 
   function toggleCart() {
@@ -66,7 +73,18 @@
     if (!totalPriceContainer) return;
     const lsContent = getLSContent();
     const total = lsContent.reduce((sum, item) => sum + item.price * item.qty, 0);
-    totalPriceContainer.innerHTML = `<span class="total">Total: ${currency(total)}</span>`;
+    totalPriceContainer.textContent = `${currency(total)}`;
+    updateCartCounts(lsContent);
+  }
+
+  function updateCartCounts(lsContent = getLSContent()) {
+    const count = lsContent.reduce((sum, item) => sum + (item.qty || 1), 0);
+    if (cartCount) {
+      cartCount.textContent = count;
+    }
+    if (cartCountInline) {
+      cartCountInline.textContent = `${count || 0} ${count === 1 ? "item" : "items"}`;
+    }
   }
 
   function displayProducts() {
@@ -78,25 +96,33 @@
     if (lsContent.length) {
       for (let product of lsContent) {
         const qty = product.qty || 1;
+        const lineTotal = currency(product.price * qty);
         productMarkup += `
-          <tr>
-            <td><img class="cart-image" src="${product.image}" alt="${product.name}" width="120"></td>
-            <td>
-              ${product.name}
-              ${qty > 1 ? `<div class="cart-qty">Qty ${qty}</div>` : ""}
-            </td>
-            <td>${currency(product.price * qty)}</td>
-            <td><a href="#" data-id="${product.id}" class="remove" aria-label="Remove ${product.name}">X</a></td>
-          </tr>
+          <article class="cart-item" data-id="${product.id}" role="listitem">
+            <img class="cart-image" src="${product.image}" alt="${product.name}">
+            <div>
+              <p class="cart-item-title">${product.name}</p>
+              <div class="cart-item-meta">
+                <span class="price">${lineTotal}</span>
+                <span class="qty" aria-label="Quantity ${qty}">Qty ${qty}</span>
+              </div>
+            </div>
+            <button type="button" data-id="${product.id}" class="remove" aria-label="Remove ${product.name}">×</button>
+          </article>
         `;
       }
-    } else {
-      productMarkup = '<tr><td colspan="4">Your cart is empty.</td></tr>';
     }
 
-    const body = cartContent.querySelector("tbody");
-    if (body) {
-      body.innerHTML = productMarkup;
+    cartContent.innerHTML = productMarkup;
+    toggleEmptyState(lsContent.length === 0);
+  }
+
+  function toggleEmptyState(isEmpty) {
+    if (cartContent) {
+      cartContent.style.display = isEmpty ? "none" : "flex";
+    }
+    if (cartEmpty) {
+      cartEmpty.style.display = isEmpty ? "block" : "none";
     }
   }
 
@@ -124,6 +150,8 @@
     setLSContent(lsContent);
     displayProducts();
     displayCartTotal();
+    showToast(`${prodName} added to cart`, "success");
+    openCart();
   }
 
   function removeProduct(productId) {
@@ -132,12 +160,14 @@
     setLSContent(updated);
     displayProducts();
     displayCartTotal();
+    showToast("Removed from cart", "removed");
   }
 
   function clearCart() {
     setLSContent([]);
     displayProducts();
     displayCartTotal();
+    showToast("Cart cleared", "info");
   }
 
   function checkout() {
@@ -148,6 +178,35 @@
     }
 
     window.location.href = "checkout.html";
+  }
+
+  function ensureToastContainer() {
+    if (toastContainer) return toastContainer;
+    toastContainer = document.createElement("div");
+    toastContainer.className = "cart-toast-container";
+    document.body.appendChild(toastContainer);
+    return toastContainer;
+  }
+
+  function showToast(message, tone = "success") {
+    const container = ensureToastContainer();
+    const toast = document.createElement("div");
+    toast.className = `cart-toast ${tone}`;
+    toast.textContent = message;
+    container.appendChild(toast);
+
+    setTimeout(() => {
+      toast.classList.add("fade-out");
+      toast.addEventListener("transitionend", () => toast.remove(), { once: true });
+    }, 1800);
+  }
+
+  function openCart() {
+    if (!cartContainer) return;
+    cartContainer.classList.add("open");
+    if (toggleCartBtn) {
+      toggleCartBtn.setAttribute("aria-expanded", "true");
+    }
   }
 
   function bindEvents() {
@@ -182,17 +241,14 @@
       }
     });
 
-    const cartBody = cartContent.querySelector("tbody");
-    if (cartBody) {
-      cartBody.addEventListener("click", function(e) {
-        const clickedBtn = e.target;
-        if (clickedBtn.classList.contains("remove")) {
-          e.preventDefault();
-          const productId = clickedBtn.getAttribute("data-id");
-          removeProduct(productId);
-        }
-      });
-    }
+    cartContent.addEventListener("click", function(e) {
+      const clickedBtn = e.target.closest(".remove");
+      if (clickedBtn) {
+        e.preventDefault();
+        const productId = clickedBtn.getAttribute("data-id");
+        removeProduct(productId);
+      }
+    });
 
     if (clearCartBtn) {
       clearCartBtn.addEventListener("click", function(e) {
