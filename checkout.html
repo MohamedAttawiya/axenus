@@ -23,6 +23,42 @@
     </section>
 
     <section class="checkout-layout">
+      <div class="checkout-summary checkout-panel">
+        <div class="panel-header">
+          <div>
+            <p class="eyebrow">Review your cart</p>
+            <h2>Order summary</h2>
+          </div>
+          <div class="discount-chip">20% auto-applied</div>
+        </div>
+
+        <div class="cart-list" data-cart-items>
+          <p class="cart-empty">Your cart is ready whenever you are. Add an item to see it here.</p>
+        </div>
+
+        <div class="checkout-totals">
+          <div class="totals-row">
+            <span>Subtotal</span>
+            <span data-subtotal>$0.00</span>
+          </div>
+          <div class="totals-row totals-row--accent">
+            <span>Axen Labs bonus (20% off)</span>
+            <span data-discount>-$0.00</span>
+          </div>
+          <div class="totals-row">
+            <span>Shipping</span>
+            <span data-shipping>$6.00</span>
+          </div>
+          <div class="totals-row totals-row--total">
+            <span>Order total</span>
+            <span data-total>$6.00</span>
+          </div>
+        </div>
+
+        <button class="cta-primary cta-primary--full" type="button">Place order</button>
+        <p class="fine-print">By placing your order, you agree to Axen Labs' terms and privacy practices. Taxes are calculated at shipment.</p>
+      </div>
+
       <div class="checkout-details">
 
         <div class="checkout-panel">
@@ -75,19 +111,19 @@
                 </label>
                 <label class="field">
                   <span>Postal code</span>
-                  <input type="text" data-postal placeholder="Postal code">
+                  <input type="text" data-postal data-blocked-input placeholder="Postal code">
                 </label>
               </div>
               <label class="field">
                 <span>Phone number</span>
                 <div class="phone-input">
                   <span class="phone-prefix" data-phone-code>+--</span>
-                  <input type="tel" data-phone placeholder="Enter phone number">
+                  <input type="tel" data-phone data-blocked-input placeholder="Enter phone number">
                 </div>
               </label>
               <label class="field">
                 <span>Street address</span>
-                <input type="text" data-address-line placeholder="123 Innovation Way">
+                <input type="text" data-address-line data-blocked-input placeholder="123 Innovation Way">
               </label>
             </div>
             <div class="shipping-availability" data-shipping-availability></div>
@@ -150,77 +186,6 @@
           </div>
         </div>
       </div>
-
-      <aside class="checkout-summary">
-        <div class="checkout-panel">
-          <div class="panel-header">
-            <div>
-              <p class="eyebrow">Build your cart</p>
-              <h2>Order summary</h2>
-            </div>
-            <div class="discount-chip">20% auto-applied</div>
-          </div>
-
-          <div class="catalog-grid">
-            <div class="catalog-card">
-              <div>
-                <p class="catalog-card__name">ETHRIX Absolu</p>
-                <p class="catalog-card__meta">Surface bonding additive</p>
-              </div>
-              <div class="catalog-card__actions">
-                <span class="catalog-card__price">$39</span>
-                <button type="button" class="cta-secondary" data-add-product="absolu">Add to cart</button>
-              </div>
-            </div>
-            <div class="catalog-card">
-              <div>
-                <p class="catalog-card__name">ETHRIX Flux</p>
-                <p class="catalog-card__meta">Flow optimizer</p>
-              </div>
-              <div class="catalog-card__actions">
-                <span class="catalog-card__price">$45</span>
-                <button type="button" class="cta-secondary" data-add-product="flux">Add to cart</button>
-              </div>
-            </div>
-            <div class="catalog-card">
-              <div>
-                <p class="catalog-card__name">Axion Shield</p>
-                <p class="catalog-card__meta">Fuel system defense</p>
-              </div>
-              <div class="catalog-card__actions">
-                <span class="catalog-card__price">$32</span>
-                <button type="button" class="cta-secondary" data-add-product="shield">Add to cart</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="cart-list" data-cart-items>
-            <p class="cart-empty">Your cart is ready whenever you are. Add an item to see it here.</p>
-          </div>
-
-          <div class="checkout-totals">
-            <div class="totals-row">
-              <span>Subtotal</span>
-              <span data-subtotal>$0.00</span>
-            </div>
-            <div class="totals-row totals-row--accent">
-              <span>Axen Labs bonus (20% off)</span>
-              <span data-discount>-$0.00</span>
-            </div>
-            <div class="totals-row">
-              <span>Shipping</span>
-              <span data-shipping>$6.00</span>
-            </div>
-            <div class="totals-row totals-row--total">
-              <span>Order total</span>
-              <span data-total>$6.00</span>
-            </div>
-          </div>
-
-          <button class="cta-primary cta-primary--full" type="button">Place order</button>
-          <p class="fine-print">By placing your order, you agree to Axen Labs' terms and privacy practices. Taxes are calculated at shipment.</p>
-        </div>
-      </aside>
     </section>
   </main>
 
@@ -232,7 +197,7 @@
       <button class="partner-modal__close" type="button" aria-label="Close" data-partner-close>&times;</button>
       <p class="partner-modal__eyebrow">Axen Egypt partner</p>
       <h3 class="partner-modal__title">We have a partner in Egypt</h3>
-      <p class="partner-modal__body">Reach out to our Cairo partner to arrange your order and fulfillment locally.</p>
+      <p class="partner-modal__body">Reach out to our Egypt partner to arrange your order and fulfillment locally.</p>
       <a class="partner-modal__cta" href="https://www.axenegypt.com" target="_blank" rel="noopener" data-partner-link>Visit AxenEgypt.com</a>
     </div>
   </div>

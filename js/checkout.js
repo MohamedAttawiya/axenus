@@ -84,6 +84,7 @@ window.addEventListener("DOMContentLoaded", () => {
   const postalInput = document.querySelector("[data-postal]");
   const phoneInput = document.querySelector("[data-phone]");
   const phoneCode = document.querySelector("[data-phone-code]");
+  const blockedInputs = document.querySelectorAll("[data-blocked-input]");
   const partnerModal = document.querySelector("[data-partner-modal]");
   const partnerLink = document.querySelector("[data-partner-link]");
   const partnerClosers = document.querySelectorAll("[data-partner-close]");
@@ -249,25 +250,26 @@ window.addEventListener("DOMContentLoaded", () => {
 
     const selected = document.querySelector('input[name="address"]:checked');
     if (!selected || selected.value !== "ship") {
+      lockBlockedInputs(false);
       return { eligible: true };
     }
 
     const countryId = Number(countrySelect?.value || 0);
-    const cityName = citySelect?.value ? citySelect.selectedOptions[0].textContent.trim() : "";
+    const countryName = countrySelect?.value ? countrySelect.selectedOptions[0].textContent.trim() : "";
     const stateName = stateSelect?.value ? stateSelect.selectedOptions[0].textContent.trim() : "";
 
-    if (!stateName) return { eligible: null };
+    if (!countryId) {
+      lockBlockedInputs(false);
+      return { eligible: null };
+    }
 
-    const egyptianCairo =
-      countryId === 65 &&
-      (stateName.toLowerCase() === "cairo" || cityName.toLowerCase().includes("cairo"));
-
-    if (egyptianCairo) {
+    if (countryId === 65) {
       const partnerMessage =
-        'We have a partner in Egypt. Please reach out to <a href="https://www.axenegypt.com" target="_blank" rel="noopener" data-partner-inline>AxenEgypt.com</a> to arrange delivery in Cairo.';
+        'We have a partner in Egypt. Please reach out to <a href="https://www.axenegypt.com" target="_blank" rel="noopener" data-partner-inline>AxenEgypt.com</a> to arrange delivery locally.';
       shippingAvailability.innerHTML = partnerMessage;
       shippingAvailability.classList.add("shipping-availability--error");
       attachPartnerInlineLink();
+      lockBlockedInputs(false);
 
       if (!partnerShown) {
         partnerShown = true;
@@ -277,14 +279,39 @@ window.addEventListener("DOMContentLoaded", () => {
       return { eligible: false, message: "We have a partner in Egypt via AxenEgypt.com." };
     }
 
+    const eligibleCountry = countryId === 233 || countryName.toLowerCase() === "united states";
+
+    if (!eligibleCountry) {
+      const message = "Not Currently Shipping to Selected Location";
+      shippingAvailability.textContent = message;
+      shippingAvailability.classList.add("shipping-availability--error");
+      lockBlockedInputs(false);
+      return { eligible: false, message };
+    }
+
+    if (!stateName) {
+      lockBlockedInputs(false);
+      return { eligible: null };
+    }
+
     const eligible = stateName.toLowerCase() === "ohio";
 
     if (!eligible) {
       shippingAvailability.textContent = "Not Currently Shipping to Selected Location";
       shippingAvailability.classList.add("shipping-availability--error");
+      lockBlockedInputs(false);
+      return { eligible, message: "Not Currently Shipping to Selected Location" };
     }
 
-    return { eligible, message: eligible ? "" : "Not Currently Shipping to Selected Location" };
+    lockBlockedInputs(true);
+    return { eligible, message: "" };
+  }
+
+  function lockBlockedInputs(allowEntries) {
+    blockedInputs?.forEach((input) => {
+      input.disabled = !allowEntries;
+      if (!allowEntries) input.value = "";
+    });
   }
 
   async function initAddressSelectors() {
