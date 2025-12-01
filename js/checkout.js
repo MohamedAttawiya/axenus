@@ -376,25 +376,6 @@ window.addEventListener("DOMContentLoaded", () => {
     const checked = document.querySelector('input[name="shipping"]:checked');
     return checked ? Number(checked.dataset.shippingCost) : 0;
   }
-});
-
-async function fetchJsonPayload(url) {
-  const response = await fetch(url);
-  const jsonClone = response.clone();
-
-  try {
-    return await jsonClone.json();
-  } catch (err) {
-    try {
-      const buffer = await response.arrayBuffer();
-      const processedBuffer = await inflateIfNeeded(buffer);
-      const text = new TextDecoder().decode(processedBuffer);
-      return JSON.parse(text);
-    } catch (parseErr) {
-      console.error(`Failed to parse ${url}`, parseErr);
-      return [];
-    }
-  }
 
   function updatePhonePrefix(country) {
     const code = country?.phonecode ? `+${country.phonecode}` : "+--";
@@ -426,6 +407,27 @@ async function fetchJsonPayload(url) {
   function openPartnerSite() {
     window.open("https://www.axenegypt.com", "_blank", "noopener");
   }
+});
+
+async function fetchJsonPayload(url) {
+  const response = await fetch(url);
+  const jsonClone = response.clone();
+
+  try {
+    return await jsonClone.json();
+  } catch (err) {
+    try {
+      const buffer = await response.arrayBuffer();
+      const processedBuffer = await inflateIfNeeded(buffer);
+      const text = new TextDecoder().decode(processedBuffer);
+      return JSON.parse(text);
+    } catch (parseErr) {
+      console.error(`Failed to parse ${url}`, parseErr);
+      return [];
+    }
+  }
+
+  return [];
 }
 
 async function inflateIfNeeded(buffer) {
