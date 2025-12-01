@@ -185,6 +185,23 @@
   color: var(--white);
 }
 
+.phone-input {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 10px;
+}
+
+.phone-prefix {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  padding: 10px 12px;
+  min-width: 70px;
+  text-align: center;
+  color: var(--white);
+}
+
 .shipping-form {
   margin-top: 14px;
   padding: 14px;
@@ -207,10 +224,88 @@
   color: #f7a5a5;
 }
 
+.shipping-availability a {
+  color: #9fe5ff;
+  text-decoration: underline;
+}
+
+.billing-note {
+  margin-top: 10px;
+  color: var(--light-gray);
+  font-size: 0.95rem;
+}
+
 .field select:disabled,
 .field input:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.partner-modal[hidden] {
+  display: none;
+}
+
+.partner-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+}
+
+.partner-modal__overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(2px);
+}
+
+.partner-modal__dialog {
+  position: relative;
+  max-width: 420px;
+  margin: 120px auto 0;
+  background: #0f141a;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  padding: 20px 22px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+}
+
+.partner-modal__close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  color: var(--white);
+  font-size: 1.3rem;
+  cursor: pointer;
+}
+
+.partner-modal__eyebrow {
+  color: #9fe5ff;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+.partner-modal__title {
+  margin: 0 0 6px;
+}
+
+.partner-modal__body {
+  color: var(--light-gray);
+  margin-bottom: 14px;
+}
+
+.partner-modal__cta {
+  display: inline-block;
+  padding: 10px 14px;
+  background: linear-gradient(135deg, #4aa0bd, #3d7590);
+  color: var(--white);
+  border-radius: 10px;
+  font-weight: 700;
+  text-decoration: none;
+  text-align: center;
 }
 
 .checkout-summary {

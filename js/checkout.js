@@ -82,10 +82,22 @@ window.addEventListener("DOMContentLoaded", () => {
   const citySelect = document.querySelector("[data-city]");
   const addressLineInput = document.querySelector("[data-address-line]");
   const postalInput = document.querySelector("[data-postal]");
+  const phoneInput = document.querySelector("[data-phone]");
+  const phoneCode = document.querySelector("[data-phone-code]");
+  const partnerModal = document.querySelector("[data-partner-modal]");
+  const partnerLink = document.querySelector("[data-partner-link]");
+  const partnerClosers = document.querySelectorAll("[data-partner-close]");
 
   let shippingCost = getSelectedShippingCost();
+  let partnerShown = false;
 
   initAddressSelectors().catch((err) => console.error("Address data failed to load", err));
+
+  partnerClosers.forEach((node) => node.addEventListener("click", hidePartnerModal));
+  partnerLink?.addEventListener("click", (event) => {
+    event.preventDefault();
+    openPartnerSite();
+  });
 
   document.querySelectorAll("[data-add-product]").forEach((button) => {
     button.addEventListener("click", () => {
@@ -118,7 +130,7 @@ window.addEventListener("DOMContentLoaded", () => {
     input.addEventListener("change", updateSelectedAddress);
   });
 
-  [countrySelect, stateSelect, citySelect, addressLineInput, postalInput]
+  [countrySelect, stateSelect, citySelect, addressLineInput, postalInput, phoneInput]
     .filter(Boolean)
     .forEach((field) => {
       field.addEventListener("change", updateSelectedAddress);
@@ -188,7 +200,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
     if (selected.value === "ship") {
       if (availability.eligible === false) {
-        addressDisplay.textContent = "Not Currently Shipping to Selected Location";
+        addressDisplay.textContent = availability.message || "Not Currently Shipping to Selected Location";
         return;
       }
 
@@ -232,6 +244,7 @@ window.addEventListener("DOMContentLoaded", () => {
     if (!shippingAvailability) return { eligible: true };
 
     shippingAvailability.textContent = "";
+    shippingAvailability.innerHTML = "";
     shippingAvailability.classList.remove("shipping-availability--error");
 
     const selected = document.querySelector('input[name="address"]:checked');
@@ -239,9 +252,30 @@ window.addEventListener("DOMContentLoaded", () => {
       return { eligible: true };
     }
 
+    const countryId = Number(countrySelect?.value || 0);
+    const cityName = citySelect?.value ? citySelect.selectedOptions[0].textContent.trim() : "";
     const stateName = stateSelect?.value ? stateSelect.selectedOptions[0].textContent.trim() : "";
 
     if (!stateName) return { eligible: null };
+
+    const egyptianCairo =
+      countryId === 65 &&
+      (stateName.toLowerCase() === "cairo" || cityName.toLowerCase().includes("cairo"));
+
+    if (egyptianCairo) {
+      const partnerMessage =
+        'We have a partner in Egypt. Please reach out to <a href="https://www.axenegypt.com" target="_blank" rel="noopener" data-partner-inline>AxenEgypt.com</a> to arrange delivery in Cairo.';
+      shippingAvailability.innerHTML = partnerMessage;
+      shippingAvailability.classList.add("shipping-availability--error");
+      attachPartnerInlineLink();
+
+      if (!partnerShown) {
+        partnerShown = true;
+        showPartnerModal();
+      }
+
+      return { eligible: false, message: "We have a partner in Egypt via AxenEgypt.com." };
+    }
 
     const eligible = stateName.toLowerCase() === "ohio";
 
@@ -250,7 +284,7 @@ window.addEventListener("DOMContentLoaded", () => {
       shippingAvailability.classList.add("shipping-availability--error");
     }
 
-    return { eligible };
+    return { eligible, message: eligible ? "" : "Not Currently Shipping to Selected Location" };
   }
 
   async function initAddressSelectors() {
@@ -272,10 +306,12 @@ window.addEventListener("DOMContentLoaded", () => {
     if (!stateSelect || !citySelect) return;
 
     const countryId = Number(countrySelect.value);
+    const selectedCountry = countries.find((country) => country.id === countryId);
     const countryStates = states.filter((state) => state.country_id === countryId);
 
     populateSelect(stateSelect, countryStates, "name", "id", "Select a state");
     stateSelect.disabled = !countryId || !countryStates.length;
+    updatePhonePrefix(selectedCountry);
 
     await populateCitiesForState();
     updateSelectedAddress();
@@ -358,6 +394,37 @@ async function fetchJsonPayload(url) {
       console.error(`Failed to parse ${url}`, parseErr);
       return [];
     }
+  }
+
+  function updatePhonePrefix(country) {
+    const code = country?.phonecode ? `+${country.phonecode}` : "+--";
+    if (phoneCode) phoneCode.textContent = code;
+    if (phoneInput) phoneInput.placeholder = `${code} Enter phone number`;
+  }
+
+  function attachPartnerInlineLink() {
+    shippingAvailability
+      ?.querySelectorAll("[data-partner-inline]")
+      .forEach((anchor) =>
+        anchor.addEventListener("click", (event) => {
+          event.preventDefault();
+          openPartnerSite();
+        })
+      );
+  }
+
+  function showPartnerModal() {
+    if (!partnerModal) return;
+    partnerModal.hidden = false;
+  }
+
+  function hidePartnerModal() {
+    if (!partnerModal) return;
+    partnerModal.hidden = true;
+  }
+
+  function openPartnerSite() {
+    window.open("https://www.axenegypt.com", "_blank", "noopener");
   }
 }
 

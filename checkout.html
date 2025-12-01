@@ -79,11 +79,19 @@
                 </label>
               </div>
               <label class="field">
+                <span>Phone number</span>
+                <div class="phone-input">
+                  <span class="phone-prefix" data-phone-code>+--</span>
+                  <input type="tel" data-phone placeholder="Enter phone number">
+                </div>
+              </label>
+              <label class="field">
                 <span>Street address</span>
                 <input type="text" data-address-line placeholder="123 Innovation Way">
               </label>
             </div>
             <div class="shipping-availability" data-shipping-availability></div>
+            <p class="billing-note">Billing Address same as Shipping Address</p>
           </div>
         </div>
 
@@ -217,5 +225,16 @@
   </main>
 
   <div id="footer"></div>
+
+  <div class="partner-modal" data-partner-modal hidden>
+    <div class="partner-modal__overlay" data-partner-close></div>
+    <div class="partner-modal__dialog">
+      <button class="partner-modal__close" type="button" aria-label="Close" data-partner-close>&times;</button>
+      <p class="partner-modal__eyebrow">Axen Egypt partner</p>
+      <h3 class="partner-modal__title">We have a partner in Egypt</h3>
+      <p class="partner-modal__body">Reach out to our Cairo partner to arrange your order and fulfillment locally.</p>
+      <a class="partner-modal__cta" href="https://www.axenegypt.com" target="_blank" rel="noopener" data-partner-link>Visit AxenEgypt.com</a>
+    </div>
+  </div>
 </body>
 </html>
