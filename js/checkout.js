@@ -88,11 +88,24 @@ window.addEventListener("DOMContentLoaded", () => {
   const partnerModal = document.querySelector("[data-partner-modal]");
   const partnerLink = document.querySelector("[data-partner-link]");
   const partnerClosers = document.querySelectorAll("[data-partner-close]");
+  const cardNumberInput = document.querySelector("[data-card-number]");
+  const cardNameInput = document.querySelector("[data-card-name]");
+  const cardExpInput = document.querySelector("[data-card-exp]");
+  const cardCvvInput = document.querySelector("[data-card-cvv]");
+  const cardPostalInput = document.querySelector("[data-card-postal]");
+  const cardBrandNode = document.querySelector("[data-card-brand]");
+  const cardNumberHint = document.querySelector("[data-card-number-hint]");
+  const cardNameHint = document.querySelector("[data-card-name-hint]");
+  const cardExpHint = document.querySelector("[data-card-exp-hint]");
+  const cardCvvHint = document.querySelector("[data-card-cvv-hint]");
+  const cardPostalHint = document.querySelector("[data-card-postal-hint]");
 
   let shippingCost = getSelectedShippingCost();
   let partnerShown = false;
+  let currentCardBrand = "unknown";
 
   initAddressSelectors().catch((err) => console.error("Address data failed to load", err));
+  initPaymentValidation();
 
   partnerClosers.forEach((node) => node.addEventListener("click", hidePartnerModal));
   partnerLink?.addEventListener("click", (event) => {
@@ -338,6 +351,29 @@ window.addEventListener("DOMContentLoaded", () => {
 
     const countryId = Number(countrySelect.value);
     const selectedCountry = countries.find((country) => country.id === countryId);
+    const allowRegions = countryId === 233 || countryId === 65;
+
+    if (!countryId) {
+      disableRegionSelectors();
+      updatePhonePrefix(selectedCountry);
+      updateSelectedAddress();
+      return;
+    }
+
+    if (!allowRegions) {
+      disableRegionSelectors("Not available for this destination");
+      updatePhonePrefix(selectedCountry);
+      updateSelectedAddress();
+      return;
+    }
+
+    if (countryId === 65) {
+      disableRegionSelectors("Handled by Axen Egypt partner");
+      updatePhonePrefix(selectedCountry);
+      updateSelectedAddress();
+      return;
+    }
+
     const countryStates = states.filter((state) => state.country_id === countryId);
 
     populateSelect(stateSelect, countryStates, "name", "id", "Select a state");
@@ -403,6 +439,18 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  function disableRegionSelectors(statePlaceholder = "Select a state") {
+    if (stateSelect) {
+      populateSelect(stateSelect, [], "name", "id", statePlaceholder);
+      stateSelect.disabled = true;
+    }
+
+    if (citySelect) {
+      populateSelect(citySelect, [], "name", "id", "Select a city");
+      citySelect.disabled = true;
+    }
+  }
+
   function getSelectedShippingCost() {
     const checked = document.querySelector('input[name="shipping"]:checked');
     return checked ? Number(checked.dataset.shippingCost) : 0;
@@ -437,6 +485,177 @@ window.addEventListener("DOMContentLoaded", () => {
 
   function openPartnerSite() {
     window.open("https://www.axenegypt.com", "_blank", "noopener");
+  }
+
+  function initPaymentValidation() {
+    if (!cardNumberInput) return;
+
+    cardNumberInput.addEventListener("input", handleCardNumberInput);
+    cardExpInput?.addEventListener("input", handleExpiryInput);
+    cardCvvInput?.addEventListener("input", () => validateCvv(currentCardBrand));
+    cardNameInput?.addEventListener("input", validateCardName);
+    cardPostalInput?.addEventListener("input", validatePostal);
+
+    handleCardNumberInput();
+    validateExpiry();
+    validateCvv(currentCardBrand);
+    validateCardName();
+    validatePostal();
+  }
+
+  function handleCardNumberInput() {
+    const digits = (cardNumberInput?.value || "").replace(/\D/g, "");
+    currentCardBrand = detectCardBrand(digits);
+    const formatted = formatCardNumber(digits, currentCardBrand);
+    if (cardNumberInput) cardNumberInput.value = formatted;
+    if (cardBrandNode) cardBrandNode.textContent = formatBrandLabel(currentCardBrand);
+
+    validateCardNumber(digits, currentCardBrand);
+  }
+
+  function validateCardName() {
+    if (!cardNameInput) return;
+    const value = cardNameInput.value.trim();
+    const valid = value.length >= 2;
+    setFieldState(cardNameInput, cardNameHint, valid, valid ? "" : "Enter the name on the card");
+  }
+
+  function handleExpiryInput() {
+    if (!cardExpInput) return;
+    const digits = cardExpInput.value.replace(/\D/g, "").slice(0, 4);
+    let formatted = digits;
+    if (digits.length > 2) {
+      formatted = `${digits.slice(0, 2)} / ${digits.slice(2)}`;
+    }
+    cardExpInput.value = formatted;
+    validateExpiry();
+  }
+
+  function validateExpiry() {
+    if (!cardExpInput) return;
+    const [monthRaw, yearRaw] = cardExpInput.value.split("/").map((part) => part.replace(/\D/g, ""));
+    const month = Number(monthRaw);
+    const year = Number(yearRaw);
+
+    if (!monthRaw || !yearRaw) {
+      setFieldState(cardExpInput, cardExpHint, false, "Enter expiry as MM/YY");
+      return;
+    }
+
+    if (month < 1 || month > 12) {
+      setFieldState(cardExpInput, cardExpHint, false, "Use a valid month");
+      return;
+    }
+
+    const fullYear = 2000 + year;
+    const now = new Date();
+    const expiry = new Date(fullYear, month, 0);
+    const isValidDate = expiry > now;
+
+    setFieldState(cardExpInput, cardExpHint, isValidDate, isValidDate ? "" : "Card is expired");
+  }
+
+  function validateCvv(brand) {
+    if (!cardCvvInput) return;
+    const digits = cardCvvInput.value.replace(/\D/g, "");
+    const expectedLength = brand === "amex" ? 4 : 3;
+    cardCvvInput.value = digits.slice(0, expectedLength);
+    const valid = digits.length === expectedLength;
+    setFieldState(cardCvvInput, cardCvvHint, valid, valid ? "" : `${expectedLength}-digit code`);
+  }
+
+  function validatePostal() {
+    if (!cardPostalInput) return;
+    const value = cardPostalInput.value.trim();
+    const valid = value.length >= 3;
+    setFieldState(cardPostalInput, cardPostalHint, valid, valid ? "" : "Add your billing postal code");
+  }
+
+  function validateCardNumber(digits, brand) {
+    if (!digits) {
+      setFieldState(cardNumberInput, cardNumberHint, null, "");
+      return;
+    }
+
+    const length = digits.length;
+    let valid = false;
+
+    if (brand === "amex") {
+      valid = length === 15;
+    } else if (brand === "visa") {
+      valid = length === 13 || length === 16;
+    } else if (brand === "mastercard") {
+      valid = length === 16;
+    }
+
+    if (!valid || !luhnCheck(digits)) {
+      setFieldState(
+        cardNumberInput,
+        cardNumberHint,
+        false,
+        "Enter a valid Visa, Mastercard, or Amex number"
+      );
+      return;
+    }
+
+    setFieldState(cardNumberInput, cardNumberHint, true, `${formatBrandLabel(brand)} recognized`);
+  }
+
+  function detectCardBrand(digits = "") {
+    if (/^4/.test(digits)) return "visa";
+    if (/^(5[1-5]|2[2-7])/.test(digits)) return "mastercard";
+    if (/^3[47]/.test(digits)) return "amex";
+    return "unknown";
+  }
+
+  function formatBrandLabel(brand) {
+    if (brand === "visa") return "VISA";
+    if (brand === "mastercard") return "MC";
+    if (brand === "amex") return "AMEX";
+    return "••••";
+  }
+
+  function formatCardNumber(digits, brand) {
+    if (brand === "amex") {
+      return [digits.slice(0, 4), digits.slice(4, 10), digits.slice(10, 15)]
+        .filter(Boolean)
+        .join(" ");
+    }
+
+    return digits
+      .replace(/[^0-9]/g, "")
+      .match(/.{1,4}/g)
+      ?.join(" ")
+      .trim() || "";
+  }
+
+  function setFieldState(input, hintNode, isValid, message = "") {
+    const field = input?.closest(".field");
+    field?.classList.remove("is-valid", "is-invalid");
+    if (typeof isValid === "boolean") {
+      field?.classList.add(isValid ? "is-valid" : "is-invalid");
+    }
+    if (hintNode) hintNode.textContent = message;
+  }
+
+  function luhnCheck(numberString) {
+    if (!numberString) return false;
+    const digits = numberString
+      .split("")
+      .reverse()
+      .map((digit) => parseInt(digit, 10));
+
+    let sum = 0;
+    for (let i = 0; i < digits.length; i++) {
+      let digit = digits[i];
+      if (i % 2 !== 0) {
+        digit *= 2;
+        if (digit > 9) digit -= 9;
+      }
+      sum += digit;
+    }
+
+    return sum % 10 === 0;
   }
 });
 

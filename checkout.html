@@ -54,10 +54,6 @@
           </div>
         </div>
 
-        <div class="checkout-actions">
-          <button class="cta-primary cta-primary--full cta-primary--lifted" type="button">Place order</button>
-          <p class="fine-print">By placing your order, you agree to Axen Labs' terms and privacy practices. Taxes are calculated at shipment.</p>
-        </div>
       </div>
 
       <div class="checkout-details">
@@ -157,14 +153,6 @@
               </div>
               <div class="selection-card__price">$16</div>
             </label>
-            <label class="selection-card">
-              <input type="radio" name="shipping" value="pickup" data-shipping-cost="0">
-              <div class="selection-card__content">
-                <div class="selection-card__title">Will-call pickup</div>
-                <p>Reserve inventory and pick up curbside at Axen Labs HQ.</p>
-              </div>
-              <div class="selection-card__price">$0</div>
-            </label>
           </div>
         </div>
 
@@ -172,19 +160,50 @@
           <div class="panel-header">
             <div>
               <p class="eyebrow">Payment</p>
-              <h2>Secure checkout placeholder</h2>
+              <h2>Secure checkout</h2>
             </div>
             <div class="payment-pill">End-to-end encrypted</div>
           </div>
-          <div class="payment-placeholder">
-            <p class="payment-placeholder__title">Card capture is wired but not yet activated.</p>
-            <p>Use this space to embed your preferred payment gateway. Axen Labs will tokenize and vault payment details automatically once enabled.</p>
-            <ul>
-              <li>PCI-ready frame for credit, debit, and digital wallets</li>
-              <li>Address verification syncs with the selected shipping address</li>
-              <li>Real-time validation and error states baked in</li>
-            </ul>
-          </div>
+          <form class="payment-form" data-payment-form novalidate>
+            <div class="payment-grid">
+              <label class="field">
+                <span>Name on card</span>
+                <input type="text" data-card-name autocomplete="cc-name" placeholder="Full name on card">
+                <small class="input-hint" data-card-name-hint></small>
+              </label>
+              <label class="field card-number-field">
+                <span>Card number</span>
+                <div class="card-number-wrapper">
+                  <input type="text" data-card-number inputmode="numeric" autocomplete="cc-number" placeholder="0000 0000 0000 0000">
+                  <span class="card-brand" data-card-brand>••••</span>
+                </div>
+                <small class="input-hint" data-card-number-hint></small>
+              </label>
+            </div>
+            <div class="payment-grid">
+              <label class="field">
+                <span>Expiration</span>
+                <input type="text" data-card-exp inputmode="numeric" autocomplete="cc-exp" placeholder="MM / YY">
+                <small class="input-hint" data-card-exp-hint></small>
+              </label>
+              <label class="field">
+                <span>Security code</span>
+                <input type="text" data-card-cvv inputmode="numeric" autocomplete="cc-csc" placeholder="CVV">
+                <small class="input-hint" data-card-cvv-hint></small>
+              </label>
+            </div>
+            <div class="payment-grid">
+              <label class="field">
+                <span>Billing postal code</span>
+                <input type="text" data-card-postal inputmode="numeric" autocomplete="postal-code" placeholder="ZIP / Postal code">
+                <small class="input-hint" data-card-postal-hint></small>
+              </label>
+            </div>
+            <div class="checkout-actions checkout-actions--stacked">
+              <button class="cta-primary cta-primary--full cta-primary--lifted cta-primary--brand" type="button">Place order</button>
+              <p class="fine-print">By placing your order, you agree to Axen Labs' terms and privacy practices. Taxes are calculated at shipment.</p>
+            </div>
+          </form>
         </div>
       </div>
     </section>

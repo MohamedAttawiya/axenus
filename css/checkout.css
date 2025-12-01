@@ -140,6 +140,57 @@
   gap: 4px;
 }
 
+.payment-form {
+  display: grid;
+  gap: 14px;
+}
+
+.payment-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.card-number-wrapper {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-brand {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  padding: 8px 10px;
+  min-width: 70px;
+  text-align: center;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.input-hint {
+  min-height: 18px;
+  font-size: 0.85rem;
+  color: var(--light-gray);
+}
+
+.field.is-valid input,
+.field.is-valid select {
+  border-color: rgba(104, 214, 164, 0.8);
+  box-shadow: 0 0 0 2px rgba(104, 214, 164, 0.25);
+}
+
+.field.is-invalid input,
+.field.is-invalid select {
+  border-color: rgba(247, 165, 165, 0.9);
+  box-shadow: 0 0 0 2px rgba(247, 165, 165, 0.25);
+}
+
+.field.is-invalid .input-hint {
+  color: #f7a5a5;
+}
+
 .address-form {
   display: grid;
   gap: 10px;
@@ -411,6 +462,11 @@
   align-items: center;
 }
 
+.checkout-actions--stacked {
+  grid-template-columns: 1fr;
+  align-items: flex-start;
+}
+
 .cta-primary--lifted {
   background: linear-gradient(135deg, #4aa0bd, #3d7590);
   box-shadow: 0 14px 35px rgba(0, 0, 0, 0.45), 0 8px 18px rgba(74, 160, 189, 0.2);
@@ -421,6 +477,13 @@
 .cta-primary--lifted:hover {
   transform: translateY(-1px);
   box-shadow: 0 16px 38px rgba(0, 0, 0, 0.5), 0 10px 20px rgba(74, 160, 189, 0.28);
+}
+
+.cta-primary--brand {
+  background: linear-gradient(135deg, #4aa0bd, #65c0d9 45%, #3d7590);
+  border: 1px solid rgba(159, 229, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
 .checkout-actions .fine-print {
