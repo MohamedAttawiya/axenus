@@ -58,7 +58,7 @@
 
       <div class="checkout-details">
 
-        <div class="checkout-panel">
+        <div class="checkout-panel" data-shipping-method-panel>
           <div class="panel-header">
             <div>
               <p class="eyebrow">Where should we send it?</p>
@@ -79,6 +79,28 @@
               <div class="selection-card__content">
                 <div class="selection-card__title">Ship to a different address</div>
                 <p>Select your country, region, and city for courier delivery.</p>
+              </div>
+            </label>
+          </div>
+
+          <div class="address-form" data-pickup-form>
+            <div class="address-form__row">
+              <label class="field">
+                <span>First name</span>
+                <input type="text" data-pickup-first required placeholder="Enter first name">
+              </label>
+              <label class="field">
+                <span>Last name</span>
+                <input type="text" data-pickup-last required placeholder="Enter last name">
+              </label>
+            </div>
+            <label class="field">
+              <span>Pickup phone</span>
+              <div class="phone-input">
+                <select class="phone-select" data-pickup-phone-code required>
+                  <option value="">Code</option>
+                </select>
+                <input type="tel" data-pickup-phone required placeholder="Enter phone number">
               </div>
             </label>
           </div>

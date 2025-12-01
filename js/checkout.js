@@ -26,6 +26,7 @@ let countries = [];
 let states = [];
 let cities = null;
 const citiesByState = new Map();
+let shippingCost = 0;
 
 const normalizeItems = (list = []) =>
   (Array.isArray(list) ? list : [])
@@ -69,6 +70,11 @@ function syncItemsFromCart() {
 window.addEventListener("DOMContentLoaded", () => {
   hydrateItemsFromStorage();
 
+  if (!items.length) {
+    window.location.href = "products.html";
+    return;
+  }
+
   const cartList = document.querySelector("[data-cart-items]");
   const subtotalNode = document.querySelector("[data-subtotal]");
   const discountNode = document.querySelector("[data-discount]");
@@ -76,6 +82,7 @@ window.addEventListener("DOMContentLoaded", () => {
   const totalNode = document.querySelector("[data-total]");
   const addressDisplay = document.querySelector("[data-selected-address]");
   const shippingForm = document.querySelector("[data-shipping-form]");
+  const pickupForm = document.querySelector("[data-pickup-form]");
   const shippingAvailability = document.querySelector("[data-shipping-availability]");
   const countrySelect = document.querySelector("[data-country]");
   const stateSelect = document.querySelector("[data-state]");
@@ -84,10 +91,13 @@ window.addEventListener("DOMContentLoaded", () => {
   const postalInput = document.querySelector("[data-postal]");
   const phoneInput = document.querySelector("[data-phone]");
   const phoneCode = document.querySelector("[data-phone-code]");
+  const pickupPhoneCode = document.querySelector("[data-pickup-phone-code]");
+  const pickupPhoneInput = document.querySelector("[data-pickup-phone]");
   const blockedInputs = document.querySelectorAll("[data-blocked-input]");
   const partnerModal = document.querySelector("[data-partner-modal]");
   const partnerLink = document.querySelector("[data-partner-link]");
   const partnerClosers = document.querySelectorAll("[data-partner-close]");
+  const shippingMethodPanel = document.querySelector("[data-shipping-method-panel]");
   const cardNumberInput = document.querySelector("[data-card-number]");
   const cardNameInput = document.querySelector("[data-card-name]");
   const cardExpInput = document.querySelector("[data-card-exp]");
@@ -98,7 +108,7 @@ window.addEventListener("DOMContentLoaded", () => {
   const cardExpHint = document.querySelector("[data-card-exp-hint]");
   const cardCvvHint = document.querySelector("[data-card-cvv-hint]");
 
-  let shippingCost = getSelectedShippingCost();
+  let shippingCostSelection = getSelectedShippingCost();
   let partnerShown = false;
   let currentCardBrand = "unknown";
 
@@ -133,8 +143,8 @@ window.addEventListener("DOMContentLoaded", () => {
 
   document.querySelectorAll('input[name="shipping"]').forEach((input) => {
     input.addEventListener("change", () => {
-      shippingCost = getSelectedShippingCost();
-      renderTotals();
+      shippingCostSelection = getSelectedShippingCost();
+      updateSelectedAddress();
     });
   });
 
@@ -142,7 +152,7 @@ window.addEventListener("DOMContentLoaded", () => {
     input.addEventListener("change", updateSelectedAddress);
   });
 
-  [countrySelect, stateSelect, citySelect, addressLineInput, postalInput, phoneInput]
+  [countrySelect, stateSelect, citySelect, addressLineInput, postalInput, phoneInput, pickupPhoneCode, pickupPhoneInput]
     .filter(Boolean)
     .forEach((field) => {
       field.addEventListener("change", updateSelectedAddress);
@@ -209,6 +219,7 @@ window.addEventListener("DOMContentLoaded", () => {
     if (!addressDisplay) return;
 
     setShippingFormVisibility();
+    setShippingMethodVisibility();
     const availability = updateShippingAvailability();
     const selected = document.querySelector('input[name="address"]:checked');
 
@@ -217,15 +228,19 @@ window.addEventListener("DOMContentLoaded", () => {
     if (selected.value === "ship") {
       if (availability.eligible === false) {
         addressDisplay.textContent = availability.message || "Not Currently Shipping to Selected Location";
+        renderTotals();
         return;
       }
 
       const summary = buildShippingSummary();
       addressDisplay.textContent = summary || selected.dataset.addressLabel || "Select shipping address";
+      renderTotals();
       return;
     }
 
     addressDisplay.textContent = selected.dataset.addressLabel || "";
+
+    renderTotals();
   }
 
   function buildShippingSummary() {
@@ -248,12 +263,22 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   function setShippingFormVisibility() {
-    if (!shippingForm) return;
-
     const selected = document.querySelector('input[name="address"]:checked');
     const isShipping = selected?.value === "ship";
 
-    shippingForm.hidden = !isShipping;
+    if (shippingForm) shippingForm.hidden = !isShipping;
+    if (pickupForm) {
+      pickupForm.hidden = isShipping;
+      toggleRequiredFields(pickupForm, !isShipping);
+    }
+  }
+
+  function setShippingMethodVisibility() {
+    const selected = document.querySelector('input[name="address"]:checked');
+    const isShipping = selected?.value === "ship";
+
+    if (shippingMethodPanel) shippingMethodPanel.hidden = !isShipping;
+    shippingCost = isShipping ? shippingCostSelection : 0;
   }
 
   function updateShippingAvailability() {
@@ -337,6 +362,8 @@ window.addEventListener("DOMContentLoaded", () => {
 
     populateSelect(countrySelect, countries, "name", "id", "Select a country");
     countrySelect.disabled = false;
+
+    populatePickupPhoneCodes();
 
     countrySelect.addEventListener("change", handleCountryChange);
     stateSelect.addEventListener("change", handleStateChange);
@@ -437,6 +464,38 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  function populatePickupPhoneCodes() {
+    if (!pickupPhoneCode) return;
+
+    pickupPhoneCode.innerHTML = "";
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = "Code";
+    pickupPhoneCode.appendChild(placeholder);
+
+    const phoneCountries = (countries || [])
+      .filter((country) => country.phonecode)
+      .sort((a, b) => a.name.localeCompare(b.name));
+
+    phoneCountries.forEach((country) => {
+      const option = document.createElement("option");
+      option.value = country.phonecode;
+      option.textContent = `+${country.phonecode} (${country.name})`;
+      pickupPhoneCode.appendChild(option);
+    });
+
+    const defaultCountry = phoneCountries.find((country) => country.id === 233);
+    if (defaultCountry) {
+      pickupPhoneCode.value = defaultCountry.phonecode;
+    }
+
+    updatePickupPhonePlaceholder(pickupPhoneCode.value);
+
+    pickupPhoneCode.addEventListener("change", () => {
+      updatePickupPhonePlaceholder(pickupPhoneCode.value);
+    });
+  }
+
   function disableRegionSelectors(statePlaceholder = "Select a state") {
     if (stateSelect) {
       populateSelect(stateSelect, [], "name", "id", statePlaceholder);
@@ -449,6 +508,12 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  function toggleRequiredFields(container, isRequired) {
+    container?.querySelectorAll("input, select, textarea").forEach((field) => {
+      field.required = Boolean(isRequired);
+    });
+  }
+
   function getSelectedShippingCost() {
     const checked = document.querySelector('input[name="shipping"]:checked');
     return checked ? Number(checked.dataset.shippingCost) : 0;
@@ -458,6 +523,14 @@ window.addEventListener("DOMContentLoaded", () => {
     const code = country?.phonecode ? `+${country.phonecode}` : "+--";
     if (phoneCode) phoneCode.textContent = code;
     if (phoneInput) phoneInput.placeholder = `${code} Enter phone number`;
+  }
+
+  function updatePickupPhonePlaceholder(code) {
+    const cleanCode = (code || "").replace(/^\+/, "");
+    const prefix = cleanCode ? `+${cleanCode}` : "";
+    if (pickupPhoneInput) {
+      pickupPhoneInput.placeholder = prefix ? `${prefix} Enter phone number` : "Enter phone number";
+    }
   }
 
   function attachPartnerInlineLink() {
