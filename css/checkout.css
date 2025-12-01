@@ -105,6 +105,11 @@
   margin-bottom: 4px;
 }
 
+.selection-card--stacked {
+  grid-template-columns: auto 1fr;
+  align-items: flex-start;
+}
+
 .selection-card p {
   color: var(--light-gray);
   font-size: 0.95rem;
@@ -133,6 +138,45 @@
   padding-left: 18px;
   display: grid;
   gap: 4px;
+}
+
+.address-form {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.address-form__row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field span {
+  color: var(--white);
+  font-size: 0.95rem;
+}
+
+.field select,
+.field input {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 10px;
+  color: var(--white);
+  font-size: 1rem;
+}
+
+.field select:disabled,
+.field input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .checkout-summary {

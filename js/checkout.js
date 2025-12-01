@@ -22,6 +22,10 @@ const DISCOUNT_RATE = 0.2;
 const sid = (document.cookie.match(/(?:^|; )ax_sess=([^;]*)/) || [])[1] || "";
 const buyNowKey = `checkout:${sid}`;
 let items = [];
+let countries = [];
+let states = [];
+let cities = null;
+const citiesByState = new Map();
 
 const normalizeItems = (list = []) =>
   (Array.isArray(list) ? list : [])
@@ -71,8 +75,15 @@ window.addEventListener("DOMContentLoaded", () => {
   const shippingNode = document.querySelector("[data-shipping]");
   const totalNode = document.querySelector("[data-total]");
   const addressDisplay = document.querySelector("[data-selected-address]");
+  const countrySelect = document.querySelector("[data-country]");
+  const stateSelect = document.querySelector("[data-state]");
+  const citySelect = document.querySelector("[data-city]");
+  const addressLineInput = document.querySelector("[data-address-line]");
+  const postalInput = document.querySelector("[data-postal]");
 
   let shippingCost = getSelectedShippingCost();
+
+  initAddressSelectors().catch((err) => console.error("Address data failed to load", err));
 
   document.querySelectorAll("[data-add-product]").forEach((button) => {
     button.addEventListener("click", () => {
@@ -102,15 +113,19 @@ window.addEventListener("DOMContentLoaded", () => {
   });
 
   document.querySelectorAll('input[name="address"]').forEach((input) => {
-    input.addEventListener("change", () => {
-      if (addressDisplay) {
-        addressDisplay.textContent = input.dataset.addressLabel;
-      }
-    });
+    input.addEventListener("change", updateSelectedAddress);
   });
+
+  [countrySelect, stateSelect, citySelect, addressLineInput, postalInput]
+    .filter(Boolean)
+    .forEach((field) => {
+      field.addEventListener("change", updateSelectedAddress);
+      field.addEventListener("input", updateSelectedAddress);
+    });
 
   renderCartItems();
   renderTotals();
+  updateSelectedAddress();
 
   function renderCartItems() {
     if (!cartList) return;
@@ -160,8 +175,159 @@ window.addEventListener("DOMContentLoaded", () => {
     return `$${value.toFixed(2)}`;
   }
 
+  function updateSelectedAddress() {
+    if (!addressDisplay) return;
+
+    const selected = document.querySelector('input[name="address"]:checked');
+
+    if (!selected) return;
+
+    if (selected.value === "ship") {
+      const summary = buildShippingSummary();
+      addressDisplay.textContent = summary || selected.dataset.addressLabel || "Select shipping address";
+      return;
+    }
+
+    addressDisplay.textContent = selected.dataset.addressLabel || "";
+  }
+
+  function buildShippingSummary() {
+    const summaryParts = [];
+    const addressLine = addressLineInput?.value.trim();
+    const postal = postalInput?.value.trim();
+    const cityName = citySelect?.value ? citySelect.selectedOptions[0].textContent : "";
+    const stateName = stateSelect?.value ? stateSelect.selectedOptions[0].textContent : "";
+    const countryName = countrySelect?.value ? countrySelect.selectedOptions[0].textContent : "";
+
+    if (addressLine) summaryParts.push(addressLine);
+
+    const locality = [cityName, stateName].filter(Boolean).join(", ");
+    const region = [postal, countryName].filter(Boolean).join(" ").trim();
+
+    if (locality) summaryParts.push(locality);
+    if (region) summaryParts.push(region);
+
+    return summaryParts.join(" · ").trim();
+  }
+
+  async function initAddressSelectors() {
+    if (!countrySelect || !stateSelect || !citySelect) return;
+
+    countries = await fetchJsonPayload("data/countries.json");
+    states = await fetchJsonPayload("data/states.json");
+
+    populateSelect(countrySelect, countries, "name", "id", "Select a country");
+    countrySelect.disabled = false;
+
+    countrySelect.addEventListener("change", handleCountryChange);
+    stateSelect.addEventListener("change", handleStateChange);
+
+    await handleCountryChange();
+  }
+
+  async function handleCountryChange() {
+    if (!stateSelect || !citySelect) return;
+
+    const countryId = Number(countrySelect.value);
+    const countryStates = states.filter((state) => state.country_id === countryId);
+
+    populateSelect(stateSelect, countryStates, "name", "id", "Select a state");
+    stateSelect.disabled = !countryId || !countryStates.length;
+
+    await populateCitiesForState();
+    updateSelectedAddress();
+  }
+
+  async function handleStateChange() {
+    const stateId = Number(stateSelect.value);
+    await populateCitiesForState(stateId);
+    updateSelectedAddress();
+  }
+
+  async function populateCitiesForState(stateId) {
+    if (!citySelect) return;
+
+    if (!stateId) {
+      populateSelect(citySelect, [], "name", "id", "Select a city");
+      citySelect.disabled = true;
+      return;
+    }
+
+    const cityList = await getCitiesForState(stateId);
+    populateSelect(citySelect, cityList, "name", "id", "Select a city");
+    citySelect.disabled = !cityList.length;
+  }
+
+  async function getCitiesForState(stateId) {
+    if (citiesByState.has(stateId)) return citiesByState.get(stateId);
+
+    const cityData = await loadCitiesData();
+    const filtered = cityData.filter((city) => city.state_id === Number(stateId));
+    citiesByState.set(stateId, filtered);
+
+    return filtered;
+  }
+
+  async function loadCitiesData() {
+    if (cities) return cities;
+
+    cities = await fetchJsonPayload("data/cities.json.gz");
+    return cities;
+  }
+
+  function populateSelect(node, list, labelKey, valueKey, placeholder) {
+    if (!node) return;
+
+    node.innerHTML = "";
+
+    const defaultOption = document.createElement("option");
+    defaultOption.value = "";
+    defaultOption.textContent = placeholder;
+    node.appendChild(defaultOption);
+
+    (list || []).forEach((item) => {
+      const option = document.createElement("option");
+      option.value = item[valueKey];
+      option.textContent = item[labelKey];
+      node.appendChild(option);
+    });
+  }
+
   function getSelectedShippingCost() {
     const checked = document.querySelector('input[name="shipping"]:checked');
     return checked ? Number(checked.dataset.shippingCost) : 0;
   }
 });
+
+async function fetchJsonPayload(url) {
+  const response = await fetch(url);
+  const jsonClone = response.clone();
+
+  try {
+    return await jsonClone.json();
+  } catch (err) {
+    try {
+      const buffer = await response.arrayBuffer();
+      const processedBuffer = await inflateIfNeeded(buffer);
+      const text = new TextDecoder().decode(processedBuffer);
+      return JSON.parse(text);
+    } catch (parseErr) {
+      console.error(`Failed to parse ${url}`, parseErr);
+      return [];
+    }
+  }
+}
+
+async function inflateIfNeeded(buffer) {
+  if (typeof DecompressionStream !== "undefined") {
+    try {
+      const stream = new DecompressionStream("gzip");
+      const decompressed = await new Response(new Blob([buffer]).stream().pipeThrough(stream)).arrayBuffer();
+      return decompressed;
+    } catch (err) {
+      console.warn("Falling back to raw payload", err);
+    }
+  }
+
+  return buffer;
+}

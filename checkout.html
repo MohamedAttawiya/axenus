@@ -30,21 +30,54 @@
               <p class="eyebrow">Where should we send it?</p>
               <h2>Shipping address</h2>
             </div>
-            <div class="selected-address" data-selected-address>Home address</div>
+            <div class="selected-address" data-selected-address>Pickup directly from lab</div>
           </div>
           <div class="selection-grid" data-address-options>
-            <label class="selection-card">
-              <input type="radio" name="address" value="home" data-address-label="Home address" checked>
+            <label class="selection-card selection-card--stacked">
+              <input type="radio" name="address" value="pickup" data-address-label="Pickup directly from lab" checked>
               <div class="selection-card__content">
-                <div class="selection-card__title">Home address</div>
-                <p>4129 N Red Maple Court<br>Salt Lake City, UT 84101</p>
+                <div class="selection-card__title">Pickup directly from lab</div>
+                <p>7712 South Axen Parkway<br>Building 3, Bay 7<br>Provo, UT 84601</p>
               </div>
             </label>
-            <label class="selection-card">
-              <input type="radio" name="address" value="lab" data-address-label="Lab receiving">
+            <label class="selection-card selection-card--stacked">
+              <input type="radio" name="address" value="ship" data-address-label="Select shipping address">
               <div class="selection-card__content">
-                <div class="selection-card__title">Lab receiving</div>
-                <p>7712 South Axen Parkway<br>Building 3, Bay 7<br>Provo, UT 84601</p>
+                <div class="selection-card__title">Ship to a different address</div>
+                <p>Select your country, region, and city for courier delivery.</p>
+
+                <div class="address-form">
+                  <div class="address-form__row">
+                    <label class="field">
+                      <span>Country</span>
+                      <select data-country>
+                        <option value="">Select a country</option>
+                      </select>
+                    </label>
+                    <label class="field">
+                      <span>State / Province</span>
+                      <select data-state disabled>
+                        <option value="">Select a state</option>
+                      </select>
+                    </label>
+                  </div>
+                  <div class="address-form__row">
+                    <label class="field">
+                      <span>City</span>
+                      <select data-city disabled>
+                        <option value="">Select a city</option>
+                      </select>
+                    </label>
+                    <label class="field">
+                      <span>Postal code</span>
+                      <input type="text" data-postal placeholder="Postal code">
+                    </label>
+                  </div>
+                  <label class="field">
+                    <span>Street address</span>
+                    <input type="text" data-address-line placeholder="123 Innovation Way">
+                  </label>
+                </div>
               </div>
             </label>
           </div>
