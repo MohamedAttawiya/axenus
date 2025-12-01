@@ -92,13 +92,11 @@ window.addEventListener("DOMContentLoaded", () => {
   const cardNameInput = document.querySelector("[data-card-name]");
   const cardExpInput = document.querySelector("[data-card-exp]");
   const cardCvvInput = document.querySelector("[data-card-cvv]");
-  const cardPostalInput = document.querySelector("[data-card-postal]");
   const cardBrandNode = document.querySelector("[data-card-brand]");
   const cardNumberHint = document.querySelector("[data-card-number-hint]");
   const cardNameHint = document.querySelector("[data-card-name-hint]");
   const cardExpHint = document.querySelector("[data-card-exp-hint]");
   const cardCvvHint = document.querySelector("[data-card-cvv-hint]");
-  const cardPostalHint = document.querySelector("[data-card-postal-hint]");
 
   let shippingCost = getSelectedShippingCost();
   let partnerShown = false;
@@ -494,13 +492,11 @@ window.addEventListener("DOMContentLoaded", () => {
     cardExpInput?.addEventListener("input", handleExpiryInput);
     cardCvvInput?.addEventListener("input", () => validateCvv(currentCardBrand));
     cardNameInput?.addEventListener("input", validateCardName);
-    cardPostalInput?.addEventListener("input", validatePostal);
 
     handleCardNumberInput();
     validateExpiry();
     validateCvv(currentCardBrand);
     validateCardName();
-    validatePostal();
   }
 
   function handleCardNumberInput() {
@@ -562,13 +558,6 @@ window.addEventListener("DOMContentLoaded", () => {
     cardCvvInput.value = digits.slice(0, expectedLength);
     const valid = digits.length === expectedLength;
     setFieldState(cardCvvInput, cardCvvHint, valid, valid ? "" : `${expectedLength}-digit code`);
-  }
-
-  function validatePostal() {
-    if (!cardPostalInput) return;
-    const value = cardPostalInput.value.trim();
-    const valid = value.length >= 3;
-    setFieldState(cardPostalInput, cardPostalHint, valid, valid ? "" : "Add your billing postal code");
   }
 
   function validateCardNumber(digits, brand) {
