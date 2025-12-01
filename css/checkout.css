@@ -252,16 +252,6 @@
   color: var(--white);
 }
 
-.phone-prefix {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 8px;
-  padding: 10px 12px;
-  min-width: 70px;
-  text-align: center;
-  color: var(--white);
-}
-
 .shipping-form {
   margin-top: 14px;
   padding: 14px;

@@ -89,8 +89,6 @@ window.addEventListener("DOMContentLoaded", () => {
   const citySelect = document.querySelector("[data-city]");
   const addressLineInput = document.querySelector("[data-address-line]");
   const postalInput = document.querySelector("[data-postal]");
-  const phoneInput = document.querySelector("[data-phone]");
-  const phoneCode = document.querySelector("[data-phone-code]");
   const pickupPhoneCode = document.querySelector("[data-pickup-phone-code]");
   const pickupPhoneInput = document.querySelector("[data-pickup-phone]");
   const blockedInputs = document.querySelectorAll("[data-blocked-input]");
@@ -152,7 +150,7 @@ window.addEventListener("DOMContentLoaded", () => {
     input.addEventListener("change", updateSelectedAddress);
   });
 
-  [countrySelect, stateSelect, citySelect, addressLineInput, postalInput, phoneInput, pickupPhoneCode, pickupPhoneInput]
+  [countrySelect, stateSelect, citySelect, addressLineInput, postalInput, pickupPhoneCode, pickupPhoneInput]
     .filter(Boolean)
     .forEach((field) => {
       field.addEventListener("change", updateSelectedAddress);
@@ -375,26 +373,22 @@ window.addEventListener("DOMContentLoaded", () => {
     if (!stateSelect || !citySelect) return;
 
     const countryId = Number(countrySelect.value);
-    const selectedCountry = countries.find((country) => country.id === countryId);
     const allowRegions = countryId === 233 || countryId === 65;
 
     if (!countryId) {
       disableRegionSelectors();
-      updatePhonePrefix(selectedCountry);
       updateSelectedAddress();
       return;
     }
 
     if (!allowRegions) {
       disableRegionSelectors("Not available for this destination");
-      updatePhonePrefix(selectedCountry);
       updateSelectedAddress();
       return;
     }
 
     if (countryId === 65) {
       disableRegionSelectors("Handled by Axen Egypt partner");
-      updatePhonePrefix(selectedCountry);
       updateSelectedAddress();
       return;
     }
@@ -403,8 +397,6 @@ window.addEventListener("DOMContentLoaded", () => {
 
     populateSelect(stateSelect, countryStates, "name", "id", "Select a state");
     stateSelect.disabled = !countryId || !countryStates.length;
-    updatePhonePrefix(selectedCountry);
-
     await populateCitiesForState();
     updateSelectedAddress();
   }
@@ -517,12 +509,6 @@ window.addEventListener("DOMContentLoaded", () => {
   function getSelectedShippingCost() {
     const checked = document.querySelector('input[name="shipping"]:checked');
     return checked ? Number(checked.dataset.shippingCost) : 0;
-  }
-
-  function updatePhonePrefix(country) {
-    const code = country?.phonecode ? `+${country.phonecode}` : "+--";
-    if (phoneCode) phoneCode.textContent = code;
-    if (phoneInput) phoneInput.placeholder = `${code} Enter phone number`;
   }
 
   function updatePickupPhonePlaceholder(code) {
