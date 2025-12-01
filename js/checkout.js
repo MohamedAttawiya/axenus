@@ -155,10 +155,14 @@ window.addEventListener("DOMContentLoaded", () => {
 
     items.forEach((item) => {
       const linePrice = item.price * item.qty;
+      const imageSrc = item.image || "assets/images/products/ETHRIX_Absolu_Render_1200.png";
       const node = document.createElement("div");
       node.className = "cart-item";
       node.innerHTML = `
-        <div>
+        <div class="cart-item__media">
+          <img src="${imageSrc}" alt="${item.name}">
+        </div>
+        <div class="cart-item__body">
           <div>${item.name}</div>
           <div class="cart-item__meta">Qty ${item.qty} · ${formatCurrency(item.price)} each</div>
         </div>
