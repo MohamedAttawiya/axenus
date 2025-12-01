@@ -24,6 +24,7 @@
 
     <section class="checkout-layout">
       <div class="checkout-details">
+
         <div class="checkout-panel">
           <div class="panel-header">
             <div>
@@ -45,41 +46,44 @@
               <div class="selection-card__content">
                 <div class="selection-card__title">Ship to a different address</div>
                 <p>Select your country, region, and city for courier delivery.</p>
-
-                <div class="address-form">
-                  <div class="address-form__row">
-                    <label class="field">
-                      <span>Country</span>
-                      <select data-country>
-                        <option value="">Select a country</option>
-                      </select>
-                    </label>
-                    <label class="field">
-                      <span>State / Province</span>
-                      <select data-state disabled>
-                        <option value="">Select a state</option>
-                      </select>
-                    </label>
-                  </div>
-                  <div class="address-form__row">
-                    <label class="field">
-                      <span>City</span>
-                      <select data-city disabled>
-                        <option value="">Select a city</option>
-                      </select>
-                    </label>
-                    <label class="field">
-                      <span>Postal code</span>
-                      <input type="text" data-postal placeholder="Postal code">
-                    </label>
-                  </div>
-                  <label class="field">
-                    <span>Street address</span>
-                    <input type="text" data-address-line placeholder="123 Innovation Way">
-                  </label>
-                </div>
               </div>
             </label>
+          </div>
+
+          <div class="shipping-form" data-shipping-form hidden>
+            <div class="address-form">
+              <div class="address-form__row">
+                <label class="field">
+                  <span>Country</span>
+                  <select data-country>
+                    <option value="">Select a country</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span>State / Province</span>
+                  <select data-state disabled>
+                    <option value="">Select a state</option>
+                  </select>
+                </label>
+              </div>
+              <div class="address-form__row">
+                <label class="field">
+                  <span>City</span>
+                  <select data-city disabled>
+                    <option value="">Select a city</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span>Postal code</span>
+                  <input type="text" data-postal placeholder="Postal code">
+                </label>
+              </div>
+              <label class="field">
+                <span>Street address</span>
+                <input type="text" data-address-line placeholder="123 Innovation Way">
+              </label>
+            </div>
+            <div class="shipping-availability" data-shipping-availability></div>
           </div>
         </div>
 

@@ -75,6 +75,8 @@ window.addEventListener("DOMContentLoaded", () => {
   const shippingNode = document.querySelector("[data-shipping]");
   const totalNode = document.querySelector("[data-total]");
   const addressDisplay = document.querySelector("[data-selected-address]");
+  const shippingForm = document.querySelector("[data-shipping-form]");
+  const shippingAvailability = document.querySelector("[data-shipping-availability]");
   const countrySelect = document.querySelector("[data-country]");
   const stateSelect = document.querySelector("[data-state]");
   const citySelect = document.querySelector("[data-city]");
@@ -178,11 +180,18 @@ window.addEventListener("DOMContentLoaded", () => {
   function updateSelectedAddress() {
     if (!addressDisplay) return;
 
+    setShippingFormVisibility();
+    const availability = updateShippingAvailability();
     const selected = document.querySelector('input[name="address"]:checked');
 
     if (!selected) return;
 
     if (selected.value === "ship") {
+      if (availability.eligible === false) {
+        addressDisplay.textContent = "Not Currently Shipping to Selected Location";
+        return;
+      }
+
       const summary = buildShippingSummary();
       addressDisplay.textContent = summary || selected.dataset.addressLabel || "Select shipping address";
       return;
@@ -208,6 +217,40 @@ window.addEventListener("DOMContentLoaded", () => {
     if (region) summaryParts.push(region);
 
     return summaryParts.join(" · ").trim();
+  }
+
+  function setShippingFormVisibility() {
+    if (!shippingForm) return;
+
+    const selected = document.querySelector('input[name="address"]:checked');
+    const isShipping = selected?.value === "ship";
+
+    shippingForm.hidden = !isShipping;
+  }
+
+  function updateShippingAvailability() {
+    if (!shippingAvailability) return { eligible: true };
+
+    shippingAvailability.textContent = "";
+    shippingAvailability.classList.remove("shipping-availability--error");
+
+    const selected = document.querySelector('input[name="address"]:checked');
+    if (!selected || selected.value !== "ship") {
+      return { eligible: true };
+    }
+
+    const stateName = stateSelect?.value ? stateSelect.selectedOptions[0].textContent.trim() : "";
+
+    if (!stateName) return { eligible: null };
+
+    const eligible = stateName.toLowerCase() === "ohio";
+
+    if (!eligible) {
+      shippingAvailability.textContent = "Not Currently Shipping to Selected Location";
+      shippingAvailability.classList.add("shipping-availability--error");
+    }
+
+    return { eligible };
   }
 
   async function initAddressSelectors() {
