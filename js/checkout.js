@@ -91,8 +91,6 @@ window.addEventListener("DOMContentLoaded", () => {
   const postalInput = document.querySelector("[data-postal]");
   const pickupPhoneCode = document.querySelector("[data-pickup-phone-code]");
   const pickupPhoneInput = document.querySelector("[data-pickup-phone]");
-  const shippingPhoneCode = document.querySelector("[data-shipping-phone-code]");
-  const shippingPhoneInput = document.querySelector("[data-shipping-phone]");
   const blockedInputs = document.querySelectorAll("[data-blocked-input]");
   const partnerModal = document.querySelector("[data-partner-modal]");
   const partnerLink = document.querySelector("[data-partner-link]");
@@ -187,9 +185,11 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 
     const ohioDelivery = isShipping && eligibility?.eligible && countryName === "united states" && stateName === "ohio";
+    const pickupEligible = !isShipping;
+    const approvedFlow = pickupEligible || ohioDelivery;
 
-    if (!ohioDelivery) {
-      setOrderStatus("Payment Declined: orders must ship to Ohio, United States.", true);
+    if (!approvedFlow) {
+      setOrderStatus("Payment Declined: orders must be pickup or ship to Ohio, United States.", true);
       return;
     }
 
@@ -401,7 +401,6 @@ window.addEventListener("DOMContentLoaded", () => {
     countrySelect.disabled = false;
 
     populatePhoneCodes(pickupPhoneCode, pickupPhoneInput);
-    populatePhoneCodes(shippingPhoneCode, shippingPhoneInput);
 
     countrySelect.addEventListener("change", handleCountryChange);
     stateSelect.addEventListener("change", handleStateChange);
