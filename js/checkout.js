@@ -174,10 +174,16 @@ window.addEventListener("DOMContentLoaded", () => {
     const isShipping = selectedAddress?.value === "ship";
     const countryName = (countrySelect?.selectedOptions?.[0]?.textContent || "").trim().toLowerCase();
     const stateName = (stateSelect?.selectedOptions?.[0]?.textContent || "").trim().toLowerCase();
+    const requiredFieldsValid = validateRequiredFields(isShipping ? shippingForm : pickupForm);
 
     const cardApproved = [cardNumberInput, cardNameInput, cardExpInput, cardCvvInput].every((input) =>
       input?.closest(".field")?.classList.contains("is-valid")
     );
+
+    if (!requiredFieldsValid) {
+      setOrderStatus("Complete all required contact and address details to continue.", true);
+      return;
+    }
 
     if (!cardApproved) {
       setOrderStatus("Payment Declined: complete card verification to continue.", true);
@@ -195,7 +201,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
     const orderId = generateOrderId();
     setOrderStatus(`Order confirmation will be sent · ID ${orderId}`, false);
-    showOrderOverlay(orderId);
+    redirectToProcessingPage(orderId);
   });
 
   function renderCartItems() {
@@ -542,7 +548,33 @@ window.addEventListener("DOMContentLoaded", () => {
   function toggleRequiredFields(container, isRequired) {
     container?.querySelectorAll("input, select, textarea").forEach((field) => {
       field.required = Boolean(isRequired);
+      if (!isRequired) {
+        field.closest(".field")?.classList.remove("is-invalid");
+      }
     });
+  }
+
+  function validateRequiredFields(container) {
+    if (!container) return true;
+
+    let valid = true;
+
+    container.querySelectorAll("[required]").forEach((field) => {
+      const filled = Boolean((field.value || "").trim());
+      setFieldValidityState(field, filled);
+      if (!filled) valid = false;
+    });
+
+    return valid;
+  }
+
+  function setFieldValidityState(field, isValid) {
+    const wrapper = field?.closest(".field");
+    if (!wrapper) return;
+    wrapper.classList.remove("is-invalid");
+    if (!isValid) {
+      wrapper.classList.add("is-invalid");
+    }
   }
 
   function getSelectedShippingCost() {
@@ -757,23 +789,10 @@ window.addEventListener("DOMContentLoaded", () => {
     return `AX-${stamp}-${Math.random().toString(16).slice(2, 6)}`;
   }
 
-  function showOrderOverlay(orderId) {
-    const overlay = document.createElement("div");
-    overlay.className = "order-overlay";
-    overlay.innerHTML = `
-      <div class="order-overlay__content">
-        <p class="eyebrow">Authorization approved</p>
-        <h1>Order confirmation will be sent</h1>
-        <p class="order-overlay__id">Order ID: ${orderId}</p>
-        <p class="order-overlay__subtext">Securing checkout session…</p>
-      </div>
-    `;
-
-    document.body.appendChild(overlay);
-
-    setTimeout(() => {
-      window.location.href = `order-processing.html?orderId=${encodeURIComponent(orderId)}`;
-    }, 1400);
+  function redirectToProcessingPage(orderId) {
+    const url = new URL("order-processing.html", window.location.href);
+    url.searchParams.set("orderId", orderId);
+    window.location.href = url.toString();
   }
 });
 

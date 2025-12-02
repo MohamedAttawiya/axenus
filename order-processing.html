@@ -6,21 +6,20 @@
   <title>Axen Labs | Processing order</title>
   <link rel="stylesheet" href="css/main.css" />
   <link rel="stylesheet" href="css/order-flow.css" />
-  <script defer src="js/include.js"></script>
-  <script defer src="js/main.js"></script>
   <script type="module" defer src="js/order-flow.js"></script>
 </head>
-<body data-page="processing">
-  <div id="header"></div>
-  <main class="order-screen order-screen--processing">
+<body data-page="processing" class="order-processing-body">
+  <main class="order-screen order-screen--processing order-screen--immersive">
     <div class="order-screen__panel">
-      <img class="order-screen__icon" src="assets/images/icons/gear.svg" alt="Processing order">
+      <div class="order-screen__icon-wrap">
+        <div class="order-screen__icon-glow"></div>
+        <img class="order-screen__icon order-screen__icon--gear" src="assets/images/icons/gear.svg" alt="Processing order">
+      </div>
       <p class="eyebrow">Finalizing your order</p>
       <h1>Order confirmation will be sent</h1>
       <p class="order-screen__id">Order ID: <span data-order-id>Generating…</span></p>
-      <p class="order-screen__message">Running integrity checks and preparing the lab handoff.</p>
+      <p class="order-screen__message">Running integrity checks. Please keep this page open and do not refresh or navigate away.</p>
     </div>
   </main>
-  <div id="footer"></div>
 </body>
 </html>

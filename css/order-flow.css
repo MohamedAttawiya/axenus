@@ -49,11 +49,18 @@
 }
 
 .order-screen {
-  min-height: 70vh;
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 80px 16px;
+  background: radial-gradient(circle at 15% 20%, rgba(93, 166, 255, 0.1), transparent 35%),
+    radial-gradient(circle at 80% 30%, rgba(255, 115, 173, 0.08), transparent 30%),
+    linear-gradient(145deg, #0a0f19, #0d1420 45%, #06090e);
+}
+
+.order-screen--immersive {
+  padding: 120px 20px;
 }
 
 .order-screen__panel {
@@ -77,6 +84,27 @@
   height: 72px;
   margin-bottom: 18px;
   filter: drop-shadow(0 8px 18px rgba(64, 148, 255, 0.35));
+}
+
+.order-screen__icon-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.order-screen__icon-glow {
+  position: absolute;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(64, 148, 255, 0.35), transparent 60%);
+  filter: blur(8px);
+}
+
+.order-screen__icon--gear {
+  animation: spin 1.8s linear infinite;
 }
 
 .order-screen__id {
@@ -168,6 +196,15 @@
   }
   100% {
     clip: rect(8px, 999px, 60px, 0);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
 
