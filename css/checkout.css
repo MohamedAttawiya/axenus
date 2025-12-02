@@ -191,6 +191,123 @@
   color: #f7a5a5;
 }
 
+.checkout-status {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.05), transparent 35%),
+    radial-gradient(circle at 80% 10%, rgba(88, 208, 154, 0.08), transparent 30%),
+    rgba(2, 6, 16, 0.95);
+  z-index: 40;
+  backdrop-filter: blur(6px);
+}
+
+.checkout-status[hidden] {
+  display: none;
+}
+
+.checkout-status__noise {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.02) 0px,
+      rgba(255, 255, 255, 0.02) 1px,
+      transparent 2px,
+      transparent 4px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.015) 0px,
+      rgba(255, 255, 255, 0.015) 1px,
+      transparent 2px,
+      transparent 4px
+    );
+  opacity: 0.6;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  animation: drift 2.4s linear infinite;
+}
+
+.checkout-status__card {
+  position: relative;
+  background: linear-gradient(145deg, rgba(8, 19, 35, 0.92), rgba(6, 11, 20, 0.96));
+  border: 1px solid rgba(104, 214, 164, 0.4);
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 520px;
+  width: min(90vw, 560px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  display: grid;
+  gap: 12px;
+}
+
+.checkout-status__eyebrow {
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  color: var(--light-gray);
+}
+
+.checkout-status__title {
+  font-size: clamp(1.6rem, 2vw, 2rem);
+  margin: 0;
+  color: var(--white);
+}
+
+.checkout-status__id,
+.checkout-status__note {
+  margin: 0;
+  color: var(--light-gray);
+}
+
+.checkout-status__id span {
+  color: #9befd0;
+  font-weight: 700;
+}
+
+.checkout-status--error .checkout-status__card {
+  border-color: rgba(255, 104, 104, 0.7);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 104, 104, 0.35);
+}
+
+.checkout-status--glitch .checkout-status__title,
+.checkout-status--glitch .checkout-status__note {
+  animation: glitch 1.1s steps(2, end) infinite;
+  text-shadow: 2px 2px rgba(255, 104, 104, 0.35), -2px -2px rgba(104, 214, 164, 0.35);
+}
+
+@keyframes drift {
+  from {
+    background-position: 0 0, 0 0;
+  }
+  to {
+    background-position: 4px 6px, -4px -8px;
+  }
+}
+
+@keyframes glitch {
+  0% {
+    transform: translate(0);
+  }
+  20% {
+    transform: translate(-2px, 1px);
+  }
+  40% {
+    transform: translate(3px, -2px);
+  }
+  60% {
+    transform: translate(-1px, 2px);
+  }
+  80% {
+    transform: translate(2px, -1px);
+  }
+  100% {
+    transform: translate(0);
+  }
+}
+
 .address-form {
   display: grid;
   gap: 10px;

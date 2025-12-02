@@ -227,7 +227,7 @@
               </label>
             </div>
             <div class="checkout-actions checkout-actions--stacked">
-              <button class="btn-primary checkout-place-order" type="button">Place order</button>
+              <button class="btn-primary checkout-place-order" type="button" data-place-order>Place order</button>
               <p class="fine-print">By placing your order, you agree to Axen Labs' terms and privacy practices. Taxes are calculated at shipment.</p>
             </div>
           </form>
@@ -235,6 +235,16 @@
       </div>
     </section>
   </main>
+
+  <section class="checkout-status" data-status-screen hidden>
+    <div class="checkout-status__noise"></div>
+    <div class="checkout-status__card" data-status-card>
+      <p class="checkout-status__eyebrow" data-status-eyebrow>Authorizing...</p>
+      <h2 class="checkout-status__title" data-status-title>Order confirmation will be sent</h2>
+      <p class="checkout-status__id">Reference: <span data-status-id></span></p>
+      <p class="checkout-status__note" data-status-note>Finalizing your order.</p>
+    </div>
+  </section>
 
   <div id="footer"></div>
 

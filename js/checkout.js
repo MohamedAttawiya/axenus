@@ -107,6 +107,13 @@ window.addEventListener("DOMContentLoaded", () => {
   const cardNameHint = document.querySelector("[data-card-name-hint]");
   const cardExpHint = document.querySelector("[data-card-exp-hint]");
   const cardCvvHint = document.querySelector("[data-card-cvv-hint]");
+  const placeOrderButton = document.querySelector("[data-place-order]");
+  const statusScreen = document.querySelector("[data-status-screen]");
+  const statusCard = document.querySelector("[data-status-card]");
+  const statusEyebrow = document.querySelector("[data-status-eyebrow]");
+  const statusTitle = document.querySelector("[data-status-title]");
+  const statusIdNode = document.querySelector("[data-status-id]");
+  const statusNote = document.querySelector("[data-status-note]");
 
   let shippingCostSelection = getSelectedShippingCost();
   let partnerShown = false;
@@ -151,6 +158,8 @@ window.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll('input[name="address"]').forEach((input) => {
     input.addEventListener("change", updateSelectedAddress);
   });
+
+  placeOrderButton?.addEventListener("click", handlePlaceOrder);
 
   [countrySelect, stateSelect, citySelect, addressLineInput, postalInput, pickupPhoneCode, pickupPhoneInput]
     .filter(Boolean)
@@ -354,6 +363,50 @@ window.addEventListener("DOMContentLoaded", () => {
       input.disabled = !allowEntries;
       if (!allowEntries) input.value = "";
     });
+  }
+
+  function handlePlaceOrder() {
+    const selectedAddress = document.querySelector('input[name="address"]:checked');
+    const shippingCheck = updateShippingAvailability();
+    const shippingChosen = selectedAddress?.value === "ship";
+    const countryName = countrySelect?.value ? countrySelect.selectedOptions[0].textContent.trim().toLowerCase() : "";
+    const stateName = stateSelect?.value ? stateSelect.selectedOptions[0].textContent.trim().toLowerCase() : "";
+    const cardIsGreen = cardNumberInput?.closest(".field")?.classList.contains("is-valid");
+    const orderToOhio = shippingChosen && shippingCheck?.eligible === true && countryName.includes("united states") && stateName === "ohio";
+
+    const accepted = Boolean(cardIsGreen && orderToOhio);
+    const orderId = generateOrderId();
+
+    displayStatusScreen({ accepted, orderId });
+  }
+
+  function displayStatusScreen({ accepted, orderId }) {
+    if (!statusScreen || !statusCard || !statusTitle || !statusIdNode || !statusEyebrow || !statusNote) return;
+
+    statusScreen.hidden = false;
+    statusScreen.classList.remove("checkout-status--error", "checkout-status--glitch");
+    statusIdNode.textContent = orderId;
+    statusEyebrow.textContent = accepted ? "Order accepted" : "Payment interrupted";
+    statusTitle.textContent = accepted ? "Order confirmation will be sent" : "Payment Declined";
+    statusNote.textContent = accepted
+      ? "USA · Ohio order verified. Confirmation will be emailed shortly."
+      : "The transaction was declined before processing.";
+
+    if (accepted) {
+      setTimeout(() => triggerDecline(orderId), 2200);
+      return;
+    }
+
+    statusScreen.classList.add("checkout-status--error", "checkout-status--glitch");
+  }
+
+  function triggerDecline(orderId) {
+    if (!statusScreen || statusScreen.hidden) return;
+
+    statusScreen.classList.add("checkout-status--error", "checkout-status--glitch");
+    statusEyebrow.textContent = "Processing fault detected";
+    statusTitle.textContent = "Payment Declined";
+    statusNote.textContent = `Reference ${orderId} could not be captured due to a payment decline.`;
   }
 
   async function initAddressSelectors() {
@@ -709,6 +762,14 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 
     return sum % 10 === 0;
+  }
+
+  function generateOrderId() {
+    if (typeof crypto !== "undefined" && crypto.randomUUID) {
+      return crypto.randomUUID();
+    }
+
+    return `ax-${Date.now().toString(16)}-${Math.floor(Math.random() * 1_000_000).toString(16)}`;
   }
 });
 
