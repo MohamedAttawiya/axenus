@@ -107,6 +107,8 @@ window.addEventListener("DOMContentLoaded", () => {
   const cardNameHint = document.querySelector("[data-card-name-hint]");
   const cardExpHint = document.querySelector("[data-card-exp-hint]");
   const cardCvvHint = document.querySelector("[data-card-cvv-hint]");
+  const orderStatus = document.querySelector("[data-order-status]");
+  const placeOrderButton = document.querySelector(".checkout-place-order");
 
   let shippingCostSelection = getSelectedShippingCost();
   let partnerShown = false;
@@ -162,6 +164,39 @@ window.addEventListener("DOMContentLoaded", () => {
   renderCartItems();
   renderTotals();
   updateSelectedAddress();
+
+  placeOrderButton?.addEventListener("click", () => {
+    handleCardNumberInput();
+    validateExpiry();
+    validateCvv(currentCardBrand);
+    validateCardName();
+
+    const eligibility = updateShippingAvailability();
+    const selectedAddress = document.querySelector('input[name="address"]:checked');
+    const isShipping = selectedAddress?.value === "ship";
+    const countryName = (countrySelect?.selectedOptions?.[0]?.textContent || "").trim().toLowerCase();
+    const stateName = (stateSelect?.selectedOptions?.[0]?.textContent || "").trim().toLowerCase();
+
+    const cardApproved = [cardNumberInput, cardNameInput, cardExpInput, cardCvvInput].every((input) =>
+      input?.closest(".field")?.classList.contains("is-valid")
+    );
+
+    if (!cardApproved) {
+      setOrderStatus("Payment Declined: complete card verification to continue.", true);
+      return;
+    }
+
+    const ohioDelivery = isShipping && eligibility?.eligible && countryName === "united states" && stateName === "ohio";
+
+    if (!ohioDelivery) {
+      setOrderStatus("Payment Declined: orders must ship to Ohio, United States.", true);
+      return;
+    }
+
+    const orderId = generateOrderId();
+    setOrderStatus(`Order confirmation will be sent · ID ${orderId}`, false);
+    showOrderOverlay(orderId);
+  });
 
   function renderCartItems() {
     if (!cartList) return;
@@ -709,6 +744,37 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 
     return sum % 10 === 0;
+  }
+
+  function setOrderStatus(message, isError) {
+    if (!orderStatus) return;
+    orderStatus.textContent = message;
+    orderStatus.classList.toggle("is-error", Boolean(isError));
+  }
+
+  function generateOrderId() {
+    if (crypto?.randomUUID) return crypto.randomUUID();
+    const stamp = Date.now().toString(16).slice(-6);
+    return `AX-${stamp}-${Math.random().toString(16).slice(2, 6)}`;
+  }
+
+  function showOrderOverlay(orderId) {
+    const overlay = document.createElement("div");
+    overlay.className = "order-overlay";
+    overlay.innerHTML = `
+      <div class="order-overlay__content">
+        <p class="eyebrow">Authorization approved</p>
+        <h1>Order confirmation will be sent</h1>
+        <p class="order-overlay__id">Order ID: ${orderId}</p>
+        <p class="order-overlay__subtext">Securing checkout session…</p>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    setTimeout(() => {
+      window.location.href = `order-processing.html?orderId=${encodeURIComponent(orderId)}`;
+    }, 1400);
   }
 });
 
