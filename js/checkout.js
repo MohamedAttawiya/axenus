@@ -91,6 +91,8 @@ window.addEventListener("DOMContentLoaded", () => {
   const postalInput = document.querySelector("[data-postal]");
   const pickupPhoneCode = document.querySelector("[data-pickup-phone-code]");
   const pickupPhoneInput = document.querySelector("[data-pickup-phone]");
+  const shippingPhoneCode = document.querySelector("[data-shipping-phone-code]");
+  const shippingPhoneInput = document.querySelector("[data-shipping-phone]");
   const blockedInputs = document.querySelectorAll("[data-blocked-input]");
   const partnerModal = document.querySelector("[data-partner-modal]");
   const partnerLink = document.querySelector("[data-partner-link]");
@@ -269,6 +271,8 @@ window.addEventListener("DOMContentLoaded", () => {
       pickupForm.hidden = isShipping;
       toggleRequiredFields(pickupForm, !isShipping);
     }
+
+    toggleRequiredFields(shippingForm, isShipping);
   }
 
   function setShippingMethodVisibility() {
@@ -361,7 +365,8 @@ window.addEventListener("DOMContentLoaded", () => {
     populateSelect(countrySelect, countries, "name", "id", "Select a country");
     countrySelect.disabled = false;
 
-    populatePickupPhoneCodes();
+    populatePhoneCodes(pickupPhoneCode, pickupPhoneInput);
+    populatePhoneCodes(shippingPhoneCode, shippingPhoneInput);
 
     countrySelect.addEventListener("change", handleCountryChange);
     stateSelect.addEventListener("change", handleStateChange);
@@ -456,14 +461,14 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  function populatePickupPhoneCodes() {
-    if (!pickupPhoneCode) return;
+  function populatePhoneCodes(selectNode, inputNode) {
+    if (!selectNode) return;
 
-    pickupPhoneCode.innerHTML = "";
+    selectNode.innerHTML = "";
     const placeholder = document.createElement("option");
     placeholder.value = "";
     placeholder.textContent = "Code";
-    pickupPhoneCode.appendChild(placeholder);
+    selectNode.appendChild(placeholder);
 
     const phoneCountries = (countries || [])
       .filter((country) => country.phonecode)
@@ -473,18 +478,18 @@ window.addEventListener("DOMContentLoaded", () => {
       const option = document.createElement("option");
       option.value = country.phonecode;
       option.textContent = `+${country.phonecode} (${country.name})`;
-      pickupPhoneCode.appendChild(option);
+      selectNode.appendChild(option);
     });
 
     const defaultCountry = phoneCountries.find((country) => country.id === 233);
     if (defaultCountry) {
-      pickupPhoneCode.value = defaultCountry.phonecode;
+      selectNode.value = defaultCountry.phonecode;
     }
 
-    updatePickupPhonePlaceholder(pickupPhoneCode.value);
+    updatePhonePlaceholder(selectNode.value, inputNode);
 
-    pickupPhoneCode.addEventListener("change", () => {
-      updatePickupPhonePlaceholder(pickupPhoneCode.value);
+    selectNode.addEventListener("change", () => {
+      updatePhonePlaceholder(selectNode.value, inputNode);
     });
   }
 
@@ -511,11 +516,11 @@ window.addEventListener("DOMContentLoaded", () => {
     return checked ? Number(checked.dataset.shippingCost) : 0;
   }
 
-  function updatePickupPhonePlaceholder(code) {
+  function updatePhonePlaceholder(code, inputNode) {
     const cleanCode = (code || "").replace(/^\+/, "");
     const prefix = cleanCode ? `+${cleanCode}` : "";
-    if (pickupPhoneInput) {
-      pickupPhoneInput.placeholder = prefix ? `${prefix} Enter phone number` : "Enter phone number";
+    if (inputNode) {
+      inputNode.placeholder = prefix ? `${prefix} Enter phone number` : "Enter phone number";
     }
   }
 

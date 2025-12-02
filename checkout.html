@@ -106,6 +106,25 @@
           </div>
 
           <div class="shipping-form" data-shipping-form hidden>
+            <div class="address-form__row">
+              <label class="field">
+                <span>First name</span>
+                <input type="text" data-shipping-first placeholder="Enter first name" required>
+              </label>
+              <label class="field">
+                <span>Last name</span>
+                <input type="text" data-shipping-last placeholder="Enter last name" required>
+              </label>
+            </div>
+            <label class="field">
+              <span>Phone number</span>
+              <div class="phone-input">
+                <select class="phone-select" data-shipping-phone-code required>
+                  <option value="">Code</option>
+                </select>
+                <input type="tel" data-shipping-phone placeholder="Enter phone number" required>
+              </div>
+            </label>
             <div class="address-form">
               <div class="address-form__row">
                 <label class="field">

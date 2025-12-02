@@ -22,6 +22,48 @@ section {
   font-size: 0.95rem;
 }
 
+.marquee {
+  overflow: hidden;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  background: linear-gradient(90deg, rgba(159, 229, 255, 0.08) 0%, rgba(74, 160, 189, 0.08) 100%);
+}
+
+.marquee__track {
+  display: flex;
+  gap: 2rem;
+  padding: 0.9rem 0;
+  animation: marquee-scroll 22s linear infinite;
+  width: max-content;
+}
+
+.marquee__text {
+  white-space: nowrap;
+  font-weight: 600;
+  color: var(--white);
+  letter-spacing: 0.02em;
+}
+
+@keyframes marquee-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@media (max-width: 768px) {
+  .marquee__track {
+    padding: 0.75rem 0;
+    animation-duration: 26s;
+  }
+
+  .marquee__text {
+    font-size: 0.95rem;
+  }
+}
+
 /* ========== Hero Section ========== */
 .hero {
   background: url("../assets/images/hero/Hero_1920.png") no-repeat center center/cover;
@@ -136,39 +178,6 @@ section {
 }
 
 /* ========== Trust Bar ========== */
-.trust-bar {
-  padding: 2.5rem 2rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  background: #0f0f0f;
-}
-
-.trust-bar__content {
-  display: flex;
-  gap: 2rem;
-  align-items: center;
-  justify-content: center;
-  max-width: var(--max-width);
-  margin: 0 auto;
-  flex-wrap: wrap;
-  color: rgba(230, 230, 230, 0.8);
-  font-size: 0.95rem;
-}
-
-.trust-bar__content span {
-  font-weight: 600;
-  color: var(--white);
-}
-
-.trust-bar__content ul {
-  list-style: none;
-  display: flex;
-  gap: 1.5rem;
-  flex-wrap: wrap;
-  margin: 0;
-  padding: 0;
-}
-
 /* ========== Product Showcase ========== */
 .product-showcase {
   max-width: var(--max-width);
