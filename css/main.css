@@ -118,6 +118,10 @@ body {
 }
 
 @media (max-width: 768px) {
+  .navbar {
+    gap: 0.5rem;
+  }
+
   /* Hide desktop nav, show hamburger */
   .nav-links {
     display: none;
@@ -132,8 +136,27 @@ body {
     border-top: 1px solid rgba(255, 255, 255, 0.05);
   }
 
+  .navbar .logo {
+    order: 1;
+  }
+
+  .header__cart {
+    order: 2;
+    margin-left: auto;
+  }
+
+  .menu-toggle,
+  .menu-icon {
+    order: 3;
+  }
+
   .menu-icon {
     display: flex;
+    margin-left: 0.75rem;
+  }
+
+  .nav-links {
+    order: 4;
   }
 
   /* Show nav when checked */
